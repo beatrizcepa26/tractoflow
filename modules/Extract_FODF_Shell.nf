@@ -3,12 +3,12 @@ process Extract_FODF_Shell {
     label 'big_mem'
 
     input:
-    set sid, file(dwi), file(bval), file(bvec)\
+    tuple value(sid), path(dwi), path(bval), path(bvec)\
         from dwi_and_grad_for_extract_fodf_shell
 
     output:
-    set sid, "${sid}__dwi_fodf.nii.gz", "${sid}__bval_fodf",
-        "${sid}__bvec_fodf" into\
+    tuple value(sid), path("${sid}__dwi_fodf.nii.gz"), path("${sid}__bval_fodf"),
+        path("${sid}__bvec_fodf") into\
         dwi_and_grad_for_fodf
 
     script:

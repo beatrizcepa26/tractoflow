@@ -2,11 +2,11 @@ process Register_Freesurfer {
     cpus 1
 
     input:
-    set sid, file(aparc), file(wmparc), file(t1), file(affine),
-        file(warp) from labels_mat_for_reg
+    tuple val(sid), path(aparc), path(wmparc), path(t1), path(affine),
+        path(warp) from labels_mat_for_reg
 
     output:
-    set sid, "${sid}__aparc_warped.nii.gz", "${sid}__wmparc_warped.nii.gz" \
+    tuple val(sid), path("${sid}__aparc_warped.nii.gz"), path("${sid}__wmparc_warped.nii.gz") \
         into labels_for_segmentation
 
     script:

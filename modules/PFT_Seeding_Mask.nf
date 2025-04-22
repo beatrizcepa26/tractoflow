@@ -2,10 +2,10 @@ process PFT_Seeding_Mask {
     cpus 1
 
     input:
-    set sid, file(wm), file(fa), file(interface_mask) from wm_fa_int_for_pft
+    tuple value(sid), path(wm), path(fa), path(interface_mask) from wm_fa_int_for_pft
 
     output:
-    set sid, "${sid}__pft_seeding_mask.nii.gz" into seeding_mask_for_pft
+    tuple value(sid), path("${sid}__pft_seeding_mask.nii.gz") into seeding_mask_for_pft
 
     when:
         params.run_pft_tracking

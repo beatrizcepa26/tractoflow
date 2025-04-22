@@ -3,18 +3,18 @@ process Eddy_Topup {
     memory { 5.GB * task.attempt }
 
     input:
-    set sid, file(dwi), file(bval), file(bvec), val(number_rev_dwi), file(b0s_corrected),
-        file(field), file(movpar), readout, encoding\
+    tuple value(sid), path(dwi), path(bval), path(bvec), val(number_rev_dwi), path(b0s_corrected),
+        path(field), path(movpar), readout, encoding\
         from dwi_gradients_mask_topup_files_for_eddy_topup
     val(rev_b0_count) from rev_b0_counter
     val(rev_dwi_count) from rev_dwi_counter
 
     output:
-    set sid, "${sid}__dwi_corrected.nii.gz" into\
+    tuple value(sid), path("${sid}__dwi_corrected.nii.gz") into\
         dwi_from_eddy_topup
-    set sid, "${sid}__bval_eddy", "${sid}__dwi_eddy_corrected.bvec" into\
+    tuple value(sid), path("${sid}__bval_eddy"), path("${sid}__dwi_eddy_corrected.bvec") into\
         gradients_from_eddy_topup
-    file "${sid}__b0_bet_mask.nii.gz"
+    path("${sid}__b0_bet_mask.nii.gz")
 
     when:
     (rev_b0_count > 0 || rev_dwi_count > 0) && params.run_topup && params.run_eddy

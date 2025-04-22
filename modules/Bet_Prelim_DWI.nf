@@ -2,15 +2,15 @@ process Bet_Prelim_DWI {
     cpus 2
 
     input:
-    set sid, val(rev), file(dwi), file(bval), file(bvec) from dwi_gradient_for_prelim_bet
+    tuple val(sid), val(rev), path(dwi), path(bval), path(bvec) from dwi_gradient_for_prelim_bet
     val(rev_b0_count) from rev_b0_counter
     val(rev_dwi_count) from rev_dwi_counter
 
     output:
-    set sid, "${sid}__b0_bet_mask_dilated.nii.gz" into\
+    tuple val(sid), "${sid}__b0_bet_mask_dilated.nii.gz" into\
         b0_mask_for_eddy
-    file "${sid}__b0_bet.nii.gz"
-    file "${sid}__b0_bet_mask.nii.gz"
+    path("${sid}__b0_bet.nii.gz") 
+    path("${sid}__b0_bet_mask.nii.gz")
 
     when:
     (rev_b0_count == 0 && rev_dwi_count == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)

@@ -2,12 +2,12 @@ process Segment_Freesurfer {
     cpus 1
 
     input:
-    set sid, file(aparc), file(wmparc) from labels_for_segmentation
+    tuple val(sid), path(aparc), path(wmparc) from labels_for_segmentation
 
     output:
-    set sid, "${sid}__mask_wm.nii.gz" into wm_mask_freesurfer
-    file "${sid}__mask_gm.nii.gz"
-    file "${sid}__mask_csf.nii.gz"
+    tuple val(sid), path("${sid}__mask_wm.nii.gz") into wm_mask_freesurfer
+    path("${sid}__mask_gm.nii.gz")
+    path("${sid}__mask_csf.nii.gz")
 
     when:
         params.run_tractoflow_abs

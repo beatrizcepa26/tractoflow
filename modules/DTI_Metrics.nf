@@ -3,38 +3,38 @@ process DTI_Metrics {
     label 'big_mem'
 
     input:
-    set sid, file(dwi), file(bval), file(bvec), file(b0_mask)\
+    tuple value(sid), path(dwi), path(bval), path(bvec), path(b0_mask)\
         from dwi_and_grad_for_dti_metrics
 
     output:
-    file "${sid}__ad.nii.gz"
-    file "${sid}__evecs.nii.gz"
-    file "${sid}__evecs_v1.nii.gz"
-    file "${sid}__evecs_v2.nii.gz"
-    file "${sid}__evecs_v3.nii.gz"
-    file "${sid}__evals.nii.gz"
-    file "${sid}__evals_e1.nii.gz"
-    file "${sid}__evals_e2.nii.gz"
-    file "${sid}__evals_e3.nii.gz"
-    file "${sid}__fa.nii.gz"
-    file "${sid}__ga.nii.gz"
-    file "${sid}__rgb.nii.gz"
-    file "${sid}__md.nii.gz"
-    file "${sid}__mode.nii.gz"
-    file "${sid}__norm.nii.gz"
-    file "${sid}__rd.nii.gz"
-    file "${sid}__tensor.nii.gz"
-    file "${sid}__nonphysical.nii.gz"
-    file "${sid}__pulsation_std_dwi.nii.gz"
-    file "${sid}__residual.nii.gz"
-    file "${sid}__residual_iqr_residuals.npy"
-    file "${sid}__residual_mean_residuals.npy"
-    file "${sid}__residual_q1_residuals.npy"
-    file "${sid}__residual_q3_residuals.npy"
-    file "${sid}__residual_residuals_stats.png"
-    file "${sid}__residual_std_residuals.npy"
-    set sid, "${sid}__fa.nii.gz", "${sid}__md.nii.gz" into fa_md_for_fodf
-    set sid, "${sid}__fa.nii.gz" into\
+    path("${sid}__ad.nii.gz")
+    path("${sid}__evecs.nii.gz")
+    path("${sid}__evecs_v1.nii.gz")
+    path("${sid}__evecs_v2.nii.gz")
+    path("${sid}__evecs_v3.nii.gz")
+    path("${sid}__evals.nii.gz")
+    path("${sid}__evals_e1.nii.gz")
+    path("${sid}__evals_e2.nii.gz")
+    path("${sid}__evals_e3.nii.gz")
+    path("${sid}__fa.nii.gz")
+    path("${sid}__ga.nii.gz")
+    path("${sid}__rgb.nii.gz")
+    path("${sid}__md.nii.gz")
+    path("${sid}__mode.nii.gz")
+    path("${sid}__norm.nii.gz")
+    path("${sid}__rd.nii.gz")
+    path("${sid}__tensor.nii.gz")
+    path("${sid}__nonphysical.nii.gz")
+    path("${sid}__pulsation_std_dwi.nii.gz")
+    path("${sid}__residual.nii.gz")
+    path("${sid}__residual_iqr_residuals.npy")
+    path("${sid}__residual_mean_residuals.npy")
+    path("${sid}__residual_q1_residuals.npy")
+    path("${sid}__residual_q3_residuals.npy")
+    path("${sid}__residual_residuals_stats.png")
+    path("${sid}__residual_std_residuals.npy")
+    tuple value(sid), path("${sid}__fa.nii.gz"), path("${sid}__md.nii.gz") into fa_md_for_fodf
+    tuple value(sid), path("${sid}__fa.nii.gz") into\
         fa_for_reg, fa_for_pft_tracking, fa_for_local_tracking_mask, fa_for_local_seeding_mask
 
     script:

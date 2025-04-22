@@ -3,12 +3,12 @@ process Compute_FRF {
     label 'big_mem'
 
     input:
-    set sid, file(dwi), file(bval), file(bvec), file(b0_mask)\
+    tuple value(sid), path(dwi), path(bval), path(bvec), path(b0_mask)\
         from dwi_b0_for_rf
 
     output:
     set sid, "${sid}__frf.txt" into unique_frf, unique_frf_for_mean
-    file "${sid}__frf.txt" into all_frf_to_collect
+    path("${sid}__frf.txt") into all_frf_to_collect
 
     script:
     if (params.set_frf)

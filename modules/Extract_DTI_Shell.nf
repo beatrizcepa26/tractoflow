@@ -3,12 +3,12 @@ process Extract_DTI_Shell {
     label 'big_mem'
 
     input:
-    set sid, file(dwi), file(bval), file(bvec)\
+    tuple value(sid), path(dwi), path(bval), path(bvec)\
         from dwi_and_grad_for_extract_dti_shell
 
     output:
-    set sid, "${sid}__dwi_dti.nii.gz", "${sid}__bval_dti",
-        "${sid}__bvec_dti" into \
+    tuple value(sid), path("${sid}__dwi_dti.nii.gz"), path("${sid}__bval_dti"),
+        path("${sid}__bvec_dti") into \
         dwi_and_grad_for_dti_metrics, \
         dwi_and_grad_for_rf
 

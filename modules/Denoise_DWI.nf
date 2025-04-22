@@ -3,10 +3,10 @@ process Denoise_DWI {
     label 'big_mem'
 
     input:
-    set sid, val(rev), file(dwi) from dwi_for_denoise
+    tuple value(sid), val(rev), path(dwi) from dwi_for_denoise
 
     output:
-    set sid, val(rev), "${sid}_${rev}dwi_denoised.nii.gz" into\
+    tuple value(sid), val(rev), path("${sid}_${rev}dwi_denoised.nii.gz") into\
         dwi_denoised_for_mix
 
     when:

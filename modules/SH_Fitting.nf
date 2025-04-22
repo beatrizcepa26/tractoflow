@@ -2,10 +2,10 @@ process SH_Fitting {
     cpus 1
 
     input:
-    set sid, file(dwi), file(bval), file(bvec) from dwi_and_grad_for_sh_fitting
+    tuple val(sid), path(dwi), path(bval), path(bvec) from dwi_and_grad_for_sh_fitting
 
     output:
-    file "${sid}__dwi_sh.nii.gz"
+    path("${sid}__dwi_sh.nii.gz")
 
     when:
     params.sh_fitting

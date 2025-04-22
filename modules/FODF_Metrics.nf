@@ -3,17 +3,17 @@ process FODF_Metrics {
     label 'big_mem'
 
     input:
-    set sid, file(dwi), file(bval), file(bvec), file(b0_mask), file(fa),
-        file(md), file(frf) from dwi_b0_metrics_frf_for_fodf
+    tuple value(sid), path(dwi), path(bval), path(bvec), path(b0_mask), path(fa),
+        path(md), path(frf) from dwi_b0_metrics_frf_for_fodf
 
     output:
-    set sid, "${sid}__fodf.nii.gz" into fodf_for_pft_tracking, fodf_for_local_tracking
-    file "${sid}__peaks.nii.gz"
-    file "${sid}__peak_indices.nii.gz"
-    file "${sid}__afd_max.nii.gz"
-    file "${sid}__afd_total.nii.gz"
-    file "${sid}__afd_sum.nii.gz"
-    file "${sid}__nufo.nii.gz"
+    tuple value(sid), path("${sid}__fodf.nii.gz") into fodf_for_pft_tracking, fodf_for_local_tracking
+    path("${sid}__peaks.nii.gz")
+    path("${sid}__peak_indices.nii.gz")
+    path("${sid}__afd_max.nii.gz")
+    path("${sid}__afd_total.nii.gz")
+    path("${sid}__afd_sum.nii.gz")
+    path("${sid}__nufo.nii.gz")
 
     script:
     """

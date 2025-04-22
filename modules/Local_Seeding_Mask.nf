@@ -2,10 +2,10 @@ process Local_Seeding_Mask {
     cpus 1
 
     input:
-    set sid, file(wm), file(fa) from wm_fa_for_local_seeding_mask
+    tuple value(sid), path(wm), path(fa) from wm_fa_for_local_seeding_mask
 
     output:
-    set sid, "${sid}__local_seeding_mask.nii.gz" into tracking_seeding_mask_for_local
+    tuple value(sid), path("${sid}__local_seeding_mask.nii.gz") into tracking_seeding_mask_for_local
 
     when:
         params.run_local_tracking

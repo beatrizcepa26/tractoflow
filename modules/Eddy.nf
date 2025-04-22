@@ -3,15 +3,15 @@ process Eddy {
     memory { 5.GB * task.attempt }
 
     input:
-    set sid, file(dwi), file(bval), file(bvec), file(mask), readout, encoding\
+    tuple value(sid), path(dwi), path(bval), path(bvec), path(mask), readout, encoding\
         from dwi_gradients_mask_topup_files_for_eddy
     val(rev_b0_count) from rev_b0_counter
     val(rev_dwi_count) from rev_dwi_counter
 
     output:
-    set sid, "${sid}__dwi_corrected.nii.gz" into\
+    tuple value(sid), path("${sid}__dwi_corrected.nii.gz") into\
         dwi_from_eddy
-    set sid, "${sid}__bval_eddy", "${sid}__dwi_eddy_corrected.bvec" into\
+    tuple value(sid), path("${sid}__bval_eddy"), path("${sid}__dwi_eddy_corrected.bvec") into\
         gradients_from_eddy
 
     when:

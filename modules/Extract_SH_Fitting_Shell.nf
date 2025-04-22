@@ -2,12 +2,12 @@ process Extract_SH_Fitting_Shell {
     cpus 3
 
     input:
-    set sid, file(dwi), file(bval), file(bvec)\
+    tuple value(sid), path(dwi), path(bval), path(bvec)\
         from dwi_and_grad_for_extract_sh_fitting_shell
 
     output:
-    set sid, "${sid}__dwi_sh_fitting.nii.gz", "${sid}__bval_sh_fitting",
-        "${sid}__bvec_sh_fitting" into \
+    tuple value(sid), path("${sid}__dwi_sh_fitting.nii.gz"), path("${sid}__bval_sh_fitting"),
+        path("${sid}__bvec_sh_fitting") into \
         dwi_and_grad_for_sh_fitting
 
     when:

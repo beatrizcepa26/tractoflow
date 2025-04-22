@@ -3,11 +3,11 @@ process Normalize_DWI {
     label 'big_mem'
 
     input:
-    set sid, file(dwi), file(mask), file(bval), file(bvec) from dwi_mask_grad_for_normalize
+    tuple value(sid), path(dwi), path(mask), path(bval), path(bvec) from dwi_mask_grad_for_normalize
 
     output:
-    set sid, "${sid}__dwi_normalized.nii.gz" into dwi_for_resample, dwi_for_test_resample
-    file "${sid}_fa_wm_mask.nii.gz"
+    tuple value(sid), path("${sid}__dwi_normalized.nii.gz") into dwi_for_resample, dwi_for_test_resample
+    path("${sid}_fa_wm_mask.nii.gz")
 
     script:
     if (params.dti_shells)

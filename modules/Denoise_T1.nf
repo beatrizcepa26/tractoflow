@@ -2,10 +2,10 @@ process Denoise_T1 {
     cpus params.processes_denoise_t1
 
     input:
-    set sid, file(t1) from t1_for_denoise
+    tuple value(sid), path(t1) from t1_for_denoise
 
     output:
-    set sid, "${sid}__t1_denoised.nii.gz" into t1_for_mix_n4
+    tuple value(sid), path("${sid}__t1_denoised.nii.gz") into t1_for_mix_n4
 
     when:
     params.run_t1_denoising

@@ -2,10 +2,10 @@ process Crop_T1 {
     cpus 1
 
     input:
-    set sid, file(t1), file(t1_mask) from t1_and_mask_for_crop
+    tuple value(sid), path(t1), path(t1_mask) from t1_and_mask_for_crop
 
     output:
-    set sid, "${sid}__t1_bet_cropped.nii.gz", "${sid}__t1_bet_mask_cropped.nii.gz"\
+    tuple value(sid), path("${sid}__t1_bet_cropped.nii.gz"), path("${sid}__t1_bet_mask_cropped.nii.gz")\
         into t1_and_mask_for_reg
 
     script:

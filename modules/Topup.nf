@@ -2,14 +2,14 @@ process Topup {
     cpus 4
 
     input:
-      set sid, file(rev_b0), file(b0),  readout, encoding\
+      tuple val(sid), path(rev_b0), path(b0),  readout, encoding\
         from rev_b0_with_readout_encoding_for_topup
 
     output:
-      set sid, "${sid}__corrected_b0s.nii.gz", "${params.prefix_topup}_fieldcoef.nii.gz",
-      "${params.prefix_topup}_movpar.txt" into topup_files_for_eddy_topup
-      file "${sid}__rev_b0_warped.nii.gz"
-      file "${sid}__rev_b0_mean.nii.gz"
+      tuple val(sid), path("${sid}__corrected_b0s.nii.gz"), path( "${params.prefix_topup}_fieldcoef.nii.gz"),
+      path("${params.prefix_topup}_movpar.txt") into topup_files_for_eddy_topup
+      path("${sid}__rev_b0_warped.nii.gz")
+      path("${sid}__rev_b0_mean.nii.gz")
 
     when:
       params.run_topup && params.run_eddy

@@ -3,14 +3,14 @@ process Bet_DWI {
     label 'big_mem'
 
     input:
-    set sid, file(dwi), file(bval), file(bvec) from dwi_gradients_for_bet
+    tuple val(sid), path(dwi), path(bval), path(bvec) from dwi_gradients_for_bet
 
     output:
-    set sid, "${sid}__b0_bet.nii.gz", "${sid}__b0_bet_mask.nii.gz" into\
+    tuple val(sid), "${sid}__b0_bet.nii.gz", "${sid}__b0_bet_mask.nii.gz" into\
         b0_and_mask_for_crop
-    set sid, "${sid}__dwi_bet.nii.gz", "${sid}__b0_bet.nii.gz",
+    tuple val(sid), "${sid}__dwi_bet.nii.gz", "${sid}__b0_bet.nii.gz",
         "${sid}__b0_bet_mask.nii.gz" into dwi_b0_b0_mask_for_n4
-    file "${sid}__b0_no_bet.nii.gz"
+    path("${sid}__b0_no_bet.nii.gz")
 
     script:
     """
