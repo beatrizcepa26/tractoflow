@@ -155,6 +155,22 @@ workflow read_bids {
 }
 
 
+workflow readme {
+    include { README } from "./modules/README.nf"
+    README()
+}
+
+
+workflow bet_prelim_DWI {
+    include {Bet_Prelim_DWI} from "./modules/Bet_Prelim_DWI.nf"
+    b0_mask_for_eddy = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet: dwi_gradient_for_prelim_bet,
+        rev_b0_count: rev_b0_counter,
+        rev_dwi_count: rev_dwi_counter)
+}
+
+// ------------------------------------------------------------
+
+
 labels_for_reg = Channel.empty()
 freesurfer_path = Channel.from("")
 bidsignore_path = Channel.from("")
@@ -423,67 +439,14 @@ ch_sid_dwi
     .into{ch_sid_dwi_for_rev; ch_sid_dwi_for_dwi}
 
 
-process README {
-    cpus 1
-    publishDir = params.Readme_Publish_Dir
-    tag = "README"
-
-    output:
-    file "readme.txt"
-
-    script:
-    String list_options = new String();
-    for (String item : params) {
-        list_options += item + "\n"
-    }
-    """
-    echo "TractoFlow pipeline\n" >> readme.txt
-    echo "Start time: $workflow.start\n" >> readme.txt
-    echo "[Command-line]\n$workflow.commandLine\n" >> readme.txt
-    echo "[Git Info]\n" >> readme.txt
-    echo "$workflow.repository - $workflow.revision [$workflow.commitId]\n" >> readme.txt
-    echo "[Options]\n" >> readme.txt
-    echo "$list_options" >> readme.txt
-    """
-}
+readme()
 
 dwi_for_prelim_bet
     .combine(gradients_for_prelim_bet, by: [0,1])
     .set{dwi_gradient_for_prelim_bet}
 
-process Bet_Prelim_DWI {
-    cpus 2
 
-    input:
-    set sid, val(rev), file(dwi), file(bval), file(bvec) from dwi_gradient_for_prelim_bet
-    val(rev_b0_count) from rev_b0_counter
-    val(rev_dwi_count) from rev_dwi_counter
-
-    output:
-    set sid, "${sid}__b0_bet_mask_dilated.nii.gz" into\
-        b0_mask_for_eddy
-    file "${sid}__b0_bet.nii.gz"
-    file "${sid}__b0_bet_mask.nii.gz"
-
-    when:
-    (rev_b0_count == 0 && rev_dwi_count == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)
-
-    script:
-    """
-    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
-    export OMP_NUM_THREADS=1
-    export OPENBLAS_NUM_THREADS=1
-    scil_image_math.py convert $dwi $dwi --data_type float32 -f
-    scil_extract_b0.py $dwi $bval $bvec ${sid}__b0.nii.gz --mean\
-        --b0_thr $params.b0_thr_extract_b0 --force_b0_threshold
-    bet ${sid}__b0.nii.gz ${sid}__b0_bet.nii.gz -m -R -f $params.bet_prelim_f
-    scil_image_math.py convert ${sid}__b0_bet_mask.nii.gz ${sid}__b0_bet_mask.nii.gz --data_type uint8 -f
-    maskfilter ${sid}__b0_bet_mask.nii.gz dilate ${sid}__b0_bet_mask_dilated.nii.gz\
-        --npass $params.dilate_b0_mask_prelim_brain_extraction -nthreads 1
-    mrcalc ${sid}__b0.nii.gz ${sid}__b0_bet_mask_dilated.nii.gz\
-        -mult ${sid}__b0_bet.nii.gz -quiet -force -nthreads 1
-    """
-}
+bet_prelim_DWI()
 
 
 process Denoise_DWI {
