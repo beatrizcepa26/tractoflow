@@ -6,12 +6,12 @@ process Read_BIDS {
             errorStrategy = { task.attempt <= 3 ? 'retry' : 'terminate' }
 
             input:
-            path(bids_folder) from bids
-            path(fs_folder) from freesurfer_path
-            path(bidsignore) from bidsignore_path
+            path(bids_folder)
+            path(fs_folder) 
+            path(bidsignore)
 
             output:
-            path("tractoflow_bids_struct.json") into bids_struct
+            path("tractoflow_bids_struct.json")
 
             script:
             clean_flag = params.clean_bids ? '--clean ' : ''
@@ -23,6 +23,6 @@ process Read_BIDS {
                 ${!bidsignore.empty() ? "--bids_ignore $bidsignore" : ""}\
                 -v
             """
-        }
+}
 
         
