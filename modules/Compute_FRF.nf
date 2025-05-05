@@ -7,7 +7,7 @@ process Compute_FRF {
         from dwi_b0_for_rf
 
     output:
-    set sid, "${sid}__frf.txt" into unique_frf, unique_frf_for_mean
+    tuple value(sid), path("${sid}__frf.txt") into unique_frf, unique_frf_for_mean
     path("${sid}__frf.txt") into all_frf_to_collect
 
     script:
