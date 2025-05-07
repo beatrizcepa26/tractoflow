@@ -1,38 +1,15 @@
 #!/usr/bin/env nextflow
 
-nextflow.enable.dsl=2
+include {README} from "./modules/README.nf"
+include {Read_BIDS} from "./modules/Read_BIDS.nf"
+include {Bet_Prelim_DWI} from "./modules/Bet_Prelim_DWI.nf"
+include {Denoise_DWI} from "./modules/Denoise_DWI.nf"
+
 
 import groovy.json.*
 
 // ---------------- Workflows of processes -------------------
 
-workflow read_bids {
-    include { Read_BIDS } from "./modules/Read_BIDS.nf"
-
-    bids_struct = Read_BIDS(bids_folder: bids,
-        fs_folder: freesurfer_path,
-        bidsignore: bidsignore_path)
-}
-
-
-workflow readme {
-    include { README } from "./modules/README.nf"
-    README()
-}
-
-
-workflow bet_prelim_DWI {
-    include {Bet_Prelim_DWI} from "./modules/Bet_Prelim_DWI.nf"
-    b0_mask_for_eddy = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet: dwi_gradient_for_prelim_bet,
-        rev_b0_count: rev_b0_counter,
-        rev_dwi_count: rev_dwi_counter)
-}
-
-
-workflow denoise_dwi {
-    include {Denoise_DWI} from "./modules/Denoise_DWI.nf"
-    dwi_denoised_for_mix = Denoise_DWI(dwi_for_denoise: dwi_for_denoise))
-}
 
 
 workflow gibbs_correction {
@@ -254,112 +231,116 @@ workflow local_tracking{
 // ---------------- Main workflow -------------------
 
 
+
+params.input = false
+params.fs = false
+params.bidsignore = false
+params.bids = false
+params.bids_config = false
+params.help = false
+params.dti_shells = false
+params.fodf_shells = false
+
+if(params.help) {
+    usage = file("$baseDir/USAGE")
+
+    cpu_count = Runtime.runtime.availableProcessors()
+    bindings = ["clean_bids":"$params.clean_bids",
+                "sh_fitting":"$params.sh_fitting",
+                "sh_fitting_basis":"$params.sh_fitting_basis",
+                "sh_fitting_order":"$params.sh_fitting_order",
+                "b0_thr_extract_b0":"$params.b0_thr_extract_b0",
+                "dwi_shell_tolerance":"$params.dwi_shell_tolerance",
+                "dilate_b0_mask_prelim_brain_extraction":"$params.dilate_b0_mask_prelim_brain_extraction",
+                "bet_prelim_f":"$params.bet_prelim_f",
+                "run_dwi_denoising":"$params.run_dwi_denoising",
+                "extent":"$params.extent",
+                "run_gibbs_correction": "$params.run_gibbs_correction",
+                "run_topup":"$params.run_topup",
+                "encoding_direction":"$params.encoding_direction",
+                "readout":"$params.readout",
+                "run_eddy":"$params.run_eddy",
+                "eddy_cmd":"$params.eddy_cmd",
+                "bet_topup_before_eddy_f":"$params.bet_topup_before_eddy_f",
+                "use_slice_drop_correction":"$params.use_slice_drop_correction",
+                "bet_dwi_final_f":"$params.bet_dwi_final_f",
+                "fa_mask_threshold":"$params.fa_mask_threshold",
+                "run_resample_dwi":"$params.run_resample_dwi",
+                "dwi_resolution":"$params.dwi_resolution",
+                "dwi_interpolation":"$params.dwi_interpolation",
+                "max_dti_shell_value":"$params.max_dti_shell_value",
+                "min_fodf_shell_value":"$params.min_fodf_shell_value",
+                "run_t1_denoising":"$params.run_t1_denoising",
+                "run_resample_t1":"$params.run_resample_t1",
+                "t1_resolution":"$params.t1_resolution",
+                "t1_interpolation":"$params.t1_interpolation",
+                "number_of_tissues":"$params.number_of_tissues",
+                "fa":"$params.fa",
+                "min_fa":"$params.min_fa",
+                "min_nvox":"$params.min_nvox",
+                "roi_radius":"$params.roi_radius",
+                "set_frf":"$params.set_frf",
+                "manual_frf":"$params.manual_frf",
+                "mean_frf":"$params.mean_frf",
+                "sh_order":"$params.sh_order",
+                "basis":"$params.basis",
+                "fodf_metrics_a_factor":"$params.fodf_metrics_a_factor",
+                "relative_threshold":"$params.relative_threshold",
+                "max_fa_in_ventricle":"$params.max_fa_in_ventricle",
+                "min_md_in_ventricle":"$params.min_md_in_ventricle",
+                "run_pft_tracking":"$params.run_pft_tracking",
+                "pft_seeding_mask_type":"$params.pft_seeding_mask_type",
+                "pft_fa_seeding_mask_threshold":"$params.pft_fa_seeding_mask_threshold",
+                "pft_algo":"$params.pft_algo",
+                "pft_seeding":"$params.pft_seeding",
+                "pft_nbr_seeds":"$params.pft_nbr_seeds",
+                "pft_step":"$params.pft_step",
+                "pft_theta":"$params.pft_theta",
+                "pft_min_len":"$params.pft_min_len",
+                "pft_max_len":"$params.pft_max_len",
+                "pft_compress_streamlines":"$params.pft_compress_streamlines",
+                "pft_compress_value":"$params.pft_compress_value",
+                "local_seeding_mask_type":"$params.local_seeding_mask_type",
+                "local_fa_seeding_mask_threshold":"$params.local_fa_seeding_mask_threshold",
+                "local_tracking_mask_type":"$params.local_tracking_mask_type",
+                "local_fa_tracking_mask_threshold":"$params.local_fa_tracking_mask_threshold",
+                "run_local_tracking":"$params.run_local_tracking",
+                "local_compress_streamlines":"$params.local_compress_streamlines",
+                "pft_random_seed":"$params.pft_random_seed",
+                "local_algo":"$params.local_algo",
+                "local_seeding":"$params.local_seeding",
+                "local_nbr_seeds":"$params.local_nbr_seeds",
+                "local_step":"$params.local_step",
+                "local_theta":"$params.local_theta",
+                "local_sfthres":"$params.local_sfthres",
+                "local_sfthres_init":"$params.local_sfthres_init",
+                "local_min_len":"$params.local_min_len",
+                "local_max_len":"$params.local_max_len",
+                "local_compress_value":"$params.local_compress_value",
+                "local_random_seed":"$params.local_random_seed",
+                "local_batch_size_gpu":"$params.local_batch_size_gpu",
+                "local_tracking_gpu":"$params.local_tracking_gpu",
+                "cpu_count":"$cpu_count",
+                "template_t1":"$params.template_t1",
+                "processes_brain_extraction_t1":"$params.processes_brain_extraction_t1",
+                "processes_denoise_dwi":"$params.processes_denoise_dwi",
+                "processes_denoise_t1":"$params.processes_denoise_t1",
+                "processes_eddy":"$params.processes_eddy",
+                "processes_fodf":"$params.processes_fodf",
+                "processes_registration":"$params.processes_registration",
+                "processes_local_tracking":"$params.processes_local_tracking"]
+
+    engine = new groovy.text.SimpleTemplateEngine()
+    template = engine.createTemplate(usage.text).make(bindings)
+
+    print template.toString()
+    return
+}
+
+
 workflow{
 
-    params.input = false
-    params.fs = false
-    params.bidsignore = false
-    params.bids = false
-    params.bids_config = false
-    params.help = false
-    params.dti_shells = false
-    params.fodf_shells = false
 
-    if(params.help) {
-        usage = file("$baseDir/USAGE")
-
-        cpu_count = Runtime.runtime.availableProcessors()
-        bindings = ["clean_bids":"$params.clean_bids",
-                    "sh_fitting":"$params.sh_fitting",
-                    "sh_fitting_basis":"$params.sh_fitting_basis",
-                    "sh_fitting_order":"$params.sh_fitting_order",
-                    "b0_thr_extract_b0":"$params.b0_thr_extract_b0",
-                    "dwi_shell_tolerance":"$params.dwi_shell_tolerance",
-                    "dilate_b0_mask_prelim_brain_extraction":"$params.dilate_b0_mask_prelim_brain_extraction",
-                    "bet_prelim_f":"$params.bet_prelim_f",
-                    "run_dwi_denoising":"$params.run_dwi_denoising",
-                    "extent":"$params.extent",
-                    "run_gibbs_correction": "$params.run_gibbs_correction",
-                    "run_topup":"$params.run_topup",
-                    "encoding_direction":"$params.encoding_direction",
-                    "readout":"$params.readout",
-                    "run_eddy":"$params.run_eddy",
-                    "eddy_cmd":"$params.eddy_cmd",
-                    "bet_topup_before_eddy_f":"$params.bet_topup_before_eddy_f",
-                    "use_slice_drop_correction":"$params.use_slice_drop_correction",
-                    "bet_dwi_final_f":"$params.bet_dwi_final_f",
-                    "fa_mask_threshold":"$params.fa_mask_threshold",
-                    "run_resample_dwi":"$params.run_resample_dwi",
-                    "dwi_resolution":"$params.dwi_resolution",
-                    "dwi_interpolation":"$params.dwi_interpolation",
-                    "max_dti_shell_value":"$params.max_dti_shell_value",
-                    "min_fodf_shell_value":"$params.min_fodf_shell_value",
-                    "run_t1_denoising":"$params.run_t1_denoising",
-                    "run_resample_t1":"$params.run_resample_t1",
-                    "t1_resolution":"$params.t1_resolution",
-                    "t1_interpolation":"$params.t1_interpolation",
-                    "number_of_tissues":"$params.number_of_tissues",
-                    "fa":"$params.fa",
-                    "min_fa":"$params.min_fa",
-                    "min_nvox":"$params.min_nvox",
-                    "roi_radius":"$params.roi_radius",
-                    "set_frf":"$params.set_frf",
-                    "manual_frf":"$params.manual_frf",
-                    "mean_frf":"$params.mean_frf",
-                    "sh_order":"$params.sh_order",
-                    "basis":"$params.basis",
-                    "fodf_metrics_a_factor":"$params.fodf_metrics_a_factor",
-                    "relative_threshold":"$params.relative_threshold",
-                    "max_fa_in_ventricle":"$params.max_fa_in_ventricle",
-                    "min_md_in_ventricle":"$params.min_md_in_ventricle",
-                    "run_pft_tracking":"$params.run_pft_tracking",
-                    "pft_seeding_mask_type":"$params.pft_seeding_mask_type",
-                    "pft_fa_seeding_mask_threshold":"$params.pft_fa_seeding_mask_threshold",
-                    "pft_algo":"$params.pft_algo",
-                    "pft_seeding":"$params.pft_seeding",
-                    "pft_nbr_seeds":"$params.pft_nbr_seeds",
-                    "pft_step":"$params.pft_step",
-                    "pft_theta":"$params.pft_theta",
-                    "pft_min_len":"$params.pft_min_len",
-                    "pft_max_len":"$params.pft_max_len",
-                    "pft_compress_streamlines":"$params.pft_compress_streamlines",
-                    "pft_compress_value":"$params.pft_compress_value",
-                    "local_seeding_mask_type":"$params.local_seeding_mask_type",
-                    "local_fa_seeding_mask_threshold":"$params.local_fa_seeding_mask_threshold",
-                    "local_tracking_mask_type":"$params.local_tracking_mask_type",
-                    "local_fa_tracking_mask_threshold":"$params.local_fa_tracking_mask_threshold",
-                    "run_local_tracking":"$params.run_local_tracking",
-                    "local_compress_streamlines":"$params.local_compress_streamlines",
-                    "pft_random_seed":"$params.pft_random_seed",
-                    "local_algo":"$params.local_algo",
-                    "local_seeding":"$params.local_seeding",
-                    "local_nbr_seeds":"$params.local_nbr_seeds",
-                    "local_step":"$params.local_step",
-                    "local_theta":"$params.local_theta",
-                    "local_sfthres":"$params.local_sfthres",
-                    "local_sfthres_init":"$params.local_sfthres_init",
-                    "local_min_len":"$params.local_min_len",
-                    "local_max_len":"$params.local_max_len",
-                    "local_compress_value":"$params.local_compress_value",
-                    "local_random_seed":"$params.local_random_seed",
-                    "local_batch_size_gpu":"$params.local_batch_size_gpu",
-                    "local_tracking_gpu":"$params.local_tracking_gpu",
-                    "cpu_count":"$cpu_count",
-                    "template_t1":"$params.template_t1",
-                    "processes_brain_extraction_t1":"$params.processes_brain_extraction_t1",
-                    "processes_denoise_dwi":"$params.processes_denoise_dwi",
-                    "processes_denoise_t1":"$params.processes_denoise_t1",
-                    "processes_eddy":"$params.processes_eddy",
-                    "processes_fodf":"$params.processes_fodf",
-                    "processes_registration":"$params.processes_registration",
-                    "processes_local_tracking":"$params.processes_local_tracking"]
-
-        engine = new groovy.text.SimpleTemplateEngine()
-        template = engine.createTemplate(usage.text).make(bindings)
-
-        print template.toString()
-        return
-    }
 
     log.info "TractoFlow pipeline"
     log.info "==================="
@@ -367,18 +348,7 @@ workflow{
     log.info "Start time: $workflow.start"
     log.info ""
 
-    workflow.onComplete {
-        log.info "Pipeline completed at: $workflow.complete"
-        log.info "Execution status: ${ workflow.success ? 'OK' : 'failed' }"
-        log.info "Execution duration: $workflow.duration"
-    }
 
-    if( (!nextflow.version.matches('>=19.04.2'))) {
-        error "This workflow requires Nextflow (>=19.04.2, <=21.12.1) -- You are running version $nextflow.version"
-    }
-    if( (nextflow.version.matches('>21.12.1.edge'))) {
-        error "This workflow requires Nextflow (>=19.04.2, <=21.12.1) -- You are running version $nextflow.version"
-    }
 
     if (params.dti_shells){
         log.info "DTI shells extracted: $params.dti_shells"
@@ -397,39 +367,70 @@ workflow{
     labels_for_reg = Channel.empty()
     freesurfer_path = Channel.from("")
     bidsignore_path = Channel.from("")
-    if (params.input && !(params.bids && params.bids_config)){
-        log.info "Input: $params.input"
-        root = file(params.input)
+    rev_b0_for_topup = Channel.empty()
+    check_simple_rev_b0 = Channel.empty()
+
+
+    if (params.input && !(params.bids && params.bids_config)) {
+        log.info "Input: ${params.input}"
+
+        def root = file(params.input)   // returns a file system object
+
+
+
+        data = Channel
+        .fromFilePairs("$root/**/*{bval,bvec,dwi.nii.gz,t1.nii.gz}",
+                    size: 4,
+                    maxDepth:1,
+                    flat: true) 
+        { it.parent.name }
+
+
+        data.map { it -> [ it[0] ] }   // it is the tuple (sid, _, bval, ...)
+            .set { ch_sid_dwi }
+
         Channel
-            .fromFilePairs("$root/**/*{bval,bvec,dwi.nii.gz,t1.nii.gz}",
-                        size: 4,
-                        maxDepth:1,
-                        flat: true) {it.parent.name}
-            .into{data; data_for_sid}
+            .fromFilePairs("$root/**/*{aparc+aseg.nii.gz,wmparc.nii.gz}", size: 2, maxDepth: 1, flat: true)
+            { it.parent.name }
+            .set { labels_for_reg }
+
+        data
+            .map { it -> 
+                [it[0], "_", it[1..3], it[4], params.readout, params.encoding_direction].flatten()
+            }
+            .set { in_data }
+        in_data.view()
+
+        data
+            .map { it -> 
+                [it[0], "_", it[1..3], it[4], params.readout, params.encoding_direction].flatten()
+            }
+            .set { check_subjects_number }
+
+
+
+        rev_b0_for_topup = Channel
+            .fromPath("$root/**/*rev_b0.nii.gz", maxDepth: 1)
+            .map { tuple(it.parent.name, it) }
+
+        check_simple_rev_b0 = rev_b0_for_topup.map { it[0] }
+        sid_rev_b0_included = rev_b0_for_topup
+        sid_rev_b0_included_for_eddy_topup = rev_b0_for_topup
+        sid_rev_b0_for_prepare_topup_dwi = rev_b0_for_topup
+
         
-        data_for_sid.map{[it[0]]}.set{ch_sid_dwi}
 
-        labels_for_reg = Channel
-            .fromFilePairs("$root/**/*{aparc+aseg.nii.gz,wmparc.nii.gz}",
-                            size: 2,
-                            maxDepth:1,
-                            flat: true) {it.parent.name}
+        Channel.empty().set { sid_rev_dwi_included }
+        Channel.empty().set { sid_rev_dwi_included_for_eddy }
+        Channel.empty().set { sid_rev_dwi_for_prepare_topup_for_dwi }
+        Channel.empty().set { sid_rev_dwi_included_for_topup }
+        Channel.empty().set { sid_rev_dwi_for_topup}
+        Channel.empty().set { check_rev_number }
+        Channel.empty().set { ch_sid_b0 }
+        Channel.empty().set { complex_rev_b0_for_topup }
+        Channel.empty().set { check_complex_rev_b0 }
 
-        data.map{[it[0], "_", it[1..3], it[4], params.readout, params.encoding_direction].flatten()}
-            .into{in_data; check_subjects_number}
-
-        Channel
-            .fromPath("$root/**/*rev_b0.nii.gz",
-                            maxDepth:1)
-            .map{[it.parent.name, it]}
-            .tap{rev_b0_for_topup; check_simple_rev_b0}
-            .map{ [it[0]] }
-            .into{sid_rev_b0_included; sid_rev_b0_included_for_eddy_topup; sid_rev_b0_for_prepare_topup_dwi}
-
-        Channel.empty().into{sid_rev_dwi_included; sid_rev_dwi_included_for_eddy; sid_rev_dwi_for_prepare_topup_for_dwi; sid_rev_dwi_included_for_topup; sid_rev_dwi_for_topup; check_rev_number}
-        Channel.empty().into{ch_sid_b0; complex_rev_b0_for_topup; check_complex_rev_b0}
-    }
-    else if (params.bids || params.bids_config){
+    } else if (params.bids || params.bids_config) {
         if (!params.bids_config) {
             log.info "Input BIDS: $params.bids"
             if (params.fs) {
@@ -440,96 +441,89 @@ workflow{
                 bidsignore_path = file(params.bidsignore)
                 log.info "BIDSignore path: $params.bidsignore"
             }
+
             log.info "Clean_bids: $params.clean_bids"
             log.info ""
 
             bids = file(params.bids)
+            bids_struct = Channel.empty()
+            Read_BIDS(bids, freesurfer_path, bidsignore_path) |  bids_struct 
 
-            read_bids()
-        }
-
-        else {
+        } else {
             log.info "BIDS config: $params.bids_config"
             config = file(params.bids_config)
             bids_struct = Channel.from(config)
         }
 
-        ch_in_data = Channel.create()
-        ch_sid_rev_dwi = Channel.create()
-        ch_sid_rev_b0 = Channel.create()
-        ch_sid_dwi = Channel.create()
-        ch_sid_b0 = Channel.create()
-        ch_complex_rev_b0 = Channel.create()
-        ch_simple_rev_b0 = Channel.create()
-        labels_for_reg = Channel.create()
+        ch_sid_rev_dwi = Channel.empty()
+        ch_sid_rev_b0 = Channel.empty()
+        ch_in_data = Channel.empty()
+        ch_simple_rev_b0 = Channel.empty()
+        ch_complex_rev_b0 = Channel.empty()
 
         bids_struct.map{it ->
-        jsonSlurper = new JsonSlurper()
-            data = jsonSlurper.parseText(it.getText())
-            for (item in data){
-                sid = "sub-" + item.subject
+            def jsonSlurper = new groovy.json.JsonSlurper()
+                data = jsonSlurper.parseText(it.text)
+            }
+            .flatMap { parsedData -> 
+            parsedData.collect { item ->
+                def sid = "sub-" + item.subject
 
-                if (item.session){
+                if (item.session) {
                     sid += "_ses-" + item.session
                 }
 
-                if (item.run){
+                if (item.run) {
                     sid += "_run-" + item.run
                 }
-                for (key in item.keySet()){
-                    if(item[key] == 'todo'){
+
+                item.keySet().each { key ->
+                    if (item[key] == 'todo') {
                         error "Error ~ Please look at your tractoflow_bids_struct.json " +
-                        "in Read_BIDS folder.\nPlease fix todo fields and give " +
-                        "this file in input using --bids_config option instead of " +
-                        "using --bids."
-                    }
-                    else if (item[key] == 'error_readout'){
+                                "in Read_BIDS folder.\nPlease fix todo fields and give " +
+                                "this file in input using --bids_config option instead of " +
+                                "using --bids."
+                    } else if (item[key] == 'error_readout') {
                         error "Error ~ Please look at your tractoflow_bids_struct.json " +
-                        "in Read_BIDS folder.\nPlease fix error_readout fields. "+
-                        "This error indicate that readout time looks wrong.\n"+
-                        "Please correct the value or remove the subject in the json and " +
-                        "give the updated file in input using --bids_config option instead of " +
-                        "using --bids."
+                                "in Read_BIDS folder.\nPlease fix error_readout fields. " +
+                                "This error indicates that readout time looks wrong.\n" +
+                                "Please correct the value or remove the subject in the json and " +
+                                "give the updated file in input using --bids_config option instead of " +
+                                "using --bids."
                     }
                 }
-                sub = [sid, "_", file(item.bval), file(item.bvec), file(item.dwi),
-                    file(item.t1), item.TotalReadoutTime, item.DWIPhaseEncodingDir[0]]
-                ch_in_data.bind(sub)
-                ch_sid_dwi.bind([sid])
+
+                def sub = [sid, "_", file(item.bval), file(item.bvec), file(item.dwi),
+                        file(item.t1), item.TotalReadoutTime, item.DWIPhaseEncodingDir[0]]
+
+                ch_in_data = Channel.fromList(sub)
+                ch_sid_dwi = Channel.fromList([sid])
                 if(item.rev_topup) {
-                    ch_sid_rev_b0.bind([sid])
+                    ch_sid_rev_b0 = Channel.fromList([sid])
                     if(item.topup) {
-                    ch_sid_b0.bind([sid])
-                    sub_complex_rev_b0 = [sid, file(item.rev_topup), file(item.topup)]
-                    ch_complex_rev_b0.bind(sub_complex_rev_b0)
+                        ch_sid_b0 = Channel.fromList([sid])
+                        def sub_complex_rev_b0 = [sid, file(item.rev_topup), file(item.topup)]
+                        ch_complex_rev_b0 = Channel.fromList(sub_complex_rev_b0)
                     }
                     else{
-                    sub_simple_rev_b0 = [sid, file(item.rev_topup)]
-                    ch_simple_rev_b0.bind(sub_simple_rev_b0)
+                        def sub_simple_rev_b0 = [sid, file(item.rev_topup)]
+                        ch_simple_rev_b0 = Channel.fromList(sub_simple_rev_b0)
                     }
                 }
-                
                 if(item.rev_dwi){
-                    ch_rev_in_data = [sid, "_rev_", file(item.rev_bval), file(item.rev_bvec), file(item.rev_dwi),
+                    def ch_rev_in_data = [sid, "_rev_", file(item.rev_bval), file(item.rev_bvec), file(item.rev_dwi),
                                         file(item.t1), item.TotalReadoutTime, item.DWIPhaseEncodingDir[0]]
-                    ch_sid_rev_dwi.bind([sid])
-                    ch_in_data.bind(ch_rev_in_data)
+                    ch_sid_rev_dwi = Channel.fromList([sid])
+                    ch_in_data = Channel.fromList(ch_rev_in_data)
                 }
 
                 if(item.wmparc) {
-                    sub_labels_for_reg = [sid, file(item.aparc_aseg), file(item.wmparc)]
-                    labels_for_reg.bind(sub_labels_for_reg)
+                    def sub_labels_for_reg = [sid, file(item.aparc_aseg), file(item.wmparc)]
+                    labels_for_reg = Channel.fromList(sub_labels_for_reg)
                 }
-            }
-            ch_sid_rev_dwi.close()
-            ch_sid_rev_b0.close()
-            ch_sid_dwi.close()
-            ch_sid_b0.close()
-            ch_in_data.close()
-            ch_simple_rev_b0.close()
-            ch_complex_rev_b0.close()
-            labels_for_reg.close()
+            } 
         }
+
 
         Channel.empty().into{sid_rev_dwi_included; sid_rev_b0_for_prepare_topup_dwi; sid_rev_dwi_included_for_topup; check_rev_number}
         ch_sid_rev_dwi.into{sid_rev_dwi_included; sid_rev_dwi_included_for_topup; sid_rev_dwi_for_prepare_topup_for_dwi; sid_rev_dwi_included_for_eddy; check_rev_number}
@@ -538,6 +532,7 @@ workflow{
 
         ch_simple_rev_b0.into{rev_b0_for_topup; check_simple_rev_b0}
         ch_complex_rev_b0.into{complex_rev_b0_for_topup; check_complex_rev_b0}
+
     }
     else {
         error "Error ~ Please use --input, --bids or --bids_config for the input data."
@@ -584,21 +579,44 @@ workflow{
         error "Error ~ --bids parameter cannot be run with Atlas Based Segmentation (ABS) profile"
     }
 
-    (dwi, gradients, t1, readout_encoding) = in_data
-        .map{sid, rev_flag, bvals, bvecs, dwi, t1, readout, encoding -> [tuple(sid, rev_flag, dwi),
-                                            tuple(sid, rev_flag, bvals, bvecs),
-                                            tuple(sid, t1),
-                                            tuple(sid, readout, encoding)]}
-        .separate(4)
 
-    t1.unique()
-        .into{t1_for_denoise; t1_for_test_denoise}
+    t1_for_denoise = Channel.empty()
+    t1_for_test_denoise = Channel.empty()
+    rev_b0_counter = Channel.empty()
+    number_rev_b0_for_compare = Channel.empty()
+    number_subj_for_null_check = Channel.empty()
+    number_subj_for_compare = Channel.empty()
+    number_rev_dwi = Channel.empty()
+    rev_dwi_counter = Channel.empty()
+    truc = Channel.empty()
 
-    check_complex_rev_b0.concat(check_simple_rev_b0).count().into{rev_b0_counter; number_rev_b0_for_compare}
 
-    unique_subjects_number.count().into{number_subj_for_null_check; number_subj_for_compare}
+    all_info_ch = in_data
+            .map { sid, rev_flag, bvals, bvecs, dwi_v, t1_v, readout, encoding ->
+                def dwi = tuple(sid, rev_flag, dwi_v)
+                def gradients    = tuple(sid, rev_flag, bvals, bvecs)
+                def t1     = tuple(sid, t1_v)
+                def readout_encoding = tuple(sid, readout, encoding)
 
-    check_rev_number.count().into{number_rev_dwi; rev_dwi_counter}
+                return [ dwi,gradients,t1,readout_encoding ]
+            } 
+
+
+    all_info_ch.view()
+
+
+    t1_for_denoise = all_info_ch.map{it[2]}.unique()
+    t1_for_test_denoise = all_info_ch.map{it[2]}.unique()
+    rev_b0_counter = check_complex_rev_b0.concat(check_simple_rev_b0).count()
+    number_rev_b0_for_compare = check_complex_rev_b0.concat(check_simple_rev_b0).count()
+    number_subj_for_null_check = unique_subjects_number.count()
+    number_subj_for_compare = unique_subjects_number.count()
+
+
+
+
+    number_rev_dwi = check_rev_number.count()
+    rev_dwi_counter = check_rev_number.count()
 
     if (params.eddy_cmd == "eddy_cpu" && params.processes_eddy == 1 && params.run_eddy == true){
     number_rev_dwi
@@ -632,7 +650,10 @@ workflow{
             "Please be sure to have the same acquisitions for all subjects."}
     }
 
-    dwi.into{dwi_for_prelim_bet; dwi_for_denoise; dwi_for_test_denoise;truc}
+    dwi_for_prelim_bet = all_info_ch.map{it[0]}
+    dwi_for_denoise = all_info_ch.map{it[0]}
+    dwi_for_test_denoise = all_info_ch.map{it[0]}
+    truc = all_info_ch.map{it[0]}
 
     if (params.pft_random_seed instanceof String){
         pft_random_seed = params.pft_random_seed?.tokenize(',')
@@ -648,32 +669,38 @@ workflow{
         local_random_seed = params.local_random_seed
     }
 
-    gradients
-        .into{gradients_for_prelim_bet; gradients_for_eddy;
-            gradients_for_prepare_topup;
-            gradients_for_prepare_dwi_for_eddy;
-            gradients_for_eddy_topup; gradients_for_test_eddy_topup}
+    gradients_for_prelim_bet = all_info_ch.map{it[1]}
+    gradients_for_eddy = all_info_ch.map{it[1]}
+    gradients_for_prepare_topup = all_info_ch.map{it[1]}
+    gradients_for_prepare_dwi_for_eddy = all_info_ch.map{it[1]}
+    gradients_for_eddy_topup = all_info_ch.map{it[1]} 
+    gradients_for_test_eddy_topup = all_info_ch.map{it[1]}
 
-    readout_encoding
-        .into{readout_encoding_for_topup; readout_encoding_for_eddy;
-            readout_encoding_for_eddy_topup}
+    readout_encoding_for_topup = all_info_ch.map{it[3]}
+    readout_encoding_for_eddy = all_info_ch.map{it[3]}
+    readout_encoding_for_eddy_topup = all_info_ch.map{it[3]}
 
-    ch_sid_dwi
-        .into{ch_sid_dwi_for_rev; ch_sid_dwi_for_dwi}
+    ch_sid_dwi_for_rev = ch_sid_dwi
+    ch_sid_dwi_for_dwi = ch_sid_dwi
 
 
-    readme()
+    README()
 
     dwi_for_prelim_bet
         .combine(gradients_for_prelim_bet, by: [0,1])
         .set{dwi_gradient_for_prelim_bet}
 
 
-    bet_prelim_DWI()
 
 
-    denoise_dwi()
+    Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, rev_dwi_counter)
 
+    Denoise_DWI(dwi_for_denoise)
+
+
+}
+
+workflow rest {
     dwi_for_test_denoise
         .map{it -> if(!params.run_dwi_denoising){it}}
         .mix(dwi_denoised_for_mix)
@@ -1000,3 +1027,9 @@ workflow{
 
     local_tracking()
 }
+
+workflow.onComplete {
+        log.info "Pipeline completed at: $workflow.complete"
+        log.info "Execution status: ${ workflow.success ? 'OK' : 'failed' }"
+        log.info "Execution duration: $workflow.duration"
+    }

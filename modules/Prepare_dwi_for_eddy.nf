@@ -2,12 +2,11 @@ process Prepare_dwi_for_eddy {
   cpus 2
 
   input:
-    tuple value(sid), path(dwi), path(bval), path(bvec), path(rev_dwi), path(rev_bval), \
-        path(rev_bvec) from dwi_rev_gradient_for_prepare_dwi_for_eddy
+    tuple val(sid), file(dwi), file(bval), file(bvec), file(rev_dwi), file(rev_bval), \
+        path(rev_bvec) // from dwi_rev_gradient_for_prepare_dwi_for_eddy
 
   output:
-    tuple value(sid), path("${sid}__concatenated_dwi.nii.gz"), path("${sid}__concatenated_dwi.bval"), 
-    path("${sid}__concatenated_dwi.bvec"), env(rev_number_dir) into concatenated_dwi_for_eddy
+    tuple val(sid), path("${sid}__concatenated_dwi.nii.gz"), path("${sid}__concatenated_dwi.bval"), path("${sid}__concatenated_dwi.bvec"), env(rev_number_dir) //into concatenated_dwi_for_eddy
 
   when:
     params.run_topup && params.run_eddy

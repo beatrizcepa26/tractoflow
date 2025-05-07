@@ -2,11 +2,10 @@ process Gibbs_correction {
     cpus params.processes_denoise_dwi
 
     input:
-    tuple value(sid), val(rev), path(dwi)  from dwi_for_gibbs
+    tuple val(sid), val(rev), path(dwi)  //from dwi_for_gibbs
 
     output:
-    tuple value(sid), val(rev), path("${sid}_${rev}dwi_gibbs_corrected.nii.gz") into\
-        dwi_gibbs_for_mix
+    tuple val(sid), val(rev), path("${sid}_${rev}dwi_gibbs_corrected.nii.gz") //into         dwi_gibbs_for_mix
 
     when:
         params.run_gibbs_correction
