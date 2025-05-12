@@ -4,6 +4,9 @@ include {README} from "./modules/README.nf"
 include {Read_BIDS} from "./modules/Read_BIDS.nf"
 include {Bet_Prelim_DWI} from "./modules/Bet_Prelim_DWI.nf"
 include {Denoise_DWI} from "./modules/Denoise_DWI.nf"
+include {Gibbs_correction} from "./modules/Gibbs_correction.nf"
+include { Prepare_for_Topup } from "./modules/Prepare_for_Topup.nf"
+include { Topup } from "./modules/Topup.nf"
 
 
 import groovy.json.*
@@ -399,7 +402,6 @@ workflow{
                 [it[0], "_", it[1..3], it[4], params.readout, params.encoding_direction].flatten()
             }
             .set { in_data }
-        in_data.view()
 
         data
             .map { it -> 
@@ -414,9 +416,9 @@ workflow{
             .map { tuple(it.parent.name, it) }
 
         check_simple_rev_b0 = rev_b0_for_topup.map { it[0] }
-        sid_rev_b0_included = rev_b0_for_topup
-        sid_rev_b0_included_for_eddy_topup = rev_b0_for_topup
-        sid_rev_b0_for_prepare_topup_dwi = rev_b0_for_topup
+        sid_rev_b0_included = rev_b0_for_topup.map { it[0] }
+        sid_rev_b0_included_for_eddy_topup = rev_b0_for_topup.map { it[0] }
+        sid_rev_b0_for_prepare_topup_dwi = rev_b0_for_topup.map { it[0] }
 
         
 
@@ -602,9 +604,6 @@ workflow{
             } 
 
 
-    all_info_ch.view()
-
-
     t1_for_denoise = all_info_ch.map{it[2]}.unique()
     t1_for_test_denoise = all_info_ch.map{it[2]}.unique()
     rev_b0_counter = check_complex_rev_b0.concat(check_simple_rev_b0).count()
@@ -686,32 +685,41 @@ workflow{
 
     README()
 
+
     dwi_for_prelim_bet
         .combine(gradients_for_prelim_bet, by: [0,1])
         .set{dwi_gradient_for_prelim_bet}
 
+    b0_mask_for_eddy = Channel.empty()
+    dwi_denoised_for_mix = Channel.empty()
+    dwi_gibbs_for_mix = Channel.empty()
 
 
+    (b0_mask_for_eddy,_,_) = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, rev_dwi_counter)
 
-    Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, rev_dwi_counter)
+    dwi_denoised_for_mix = Denoise_DWI(dwi_for_denoise)
 
-    Denoise_DWI(dwi_for_denoise)
-
-
-}
-
-workflow rest {
     dwi_for_test_denoise
         .map{it -> if(!params.run_dwi_denoising){it}}
         .mix(dwi_denoised_for_mix)
-        .into{dwi_for_gibbs; dwi_for_test_gibbs}
+        .set{dwi_for_gibbs}
 
-    gibbs_correction() 
+    
 
-    dwi_for_test_gibbs
+    dwi_gibbs_for_mix = Gibbs_correction(dwi_for_gibbs)
+  ///////////////////
+    dwi_for_gibbs
         .map{it -> if(!params.run_gibbs_correction){it}}
         .mix(dwi_gibbs_for_mix)
-        .into{dwi_for_eddy; dwi_for_topup; dwi_for_eddy_topup; dwi_for_test_eddy_topup}
+        .set{dwi_for_eddy}
+
+    
+    dwi_for_eddy.set{dwi_for_topup}
+    dwi_for_eddy.set{dwi_for_eddy_topup}
+    dwi_for_eddy.set{dwi_for_test_eddy_topup}
+
+    
+
 
     ch_sid_b0
     .mix(ch_sid_dwi_for_dwi)
@@ -729,6 +737,8 @@ workflow rest {
     .join(sid_rev_b0_for_prepare_topup_dwi.concat(sid_rev_dwi_for_prepare_topup_for_dwi))
     .map {[it, "_"]}
     .set{sid_dwi_for_prepare_topup}
+
+    
 
     sid_rev_b0_included
     .mix(sid_rev_dwi_included)
@@ -753,7 +763,9 @@ workflow rest {
     .map{ [it[0], it[1], it[2], it[4], it[5]] }
     .set{dwi_gradients_rev_b0_for_prepare_topup}
 
-    prepare_for_topup()
+    simple_b0_for_topup = Channel.empty()
+
+    simple_b0_for_topup = Prepare_for_Topup(dwi_gradients_rev_b0_for_prepare_topup)
 
     simple_b0_for_topup
     .branch{
@@ -771,7 +783,16 @@ workflow rest {
     .join(readout_encoding_for_topup)
     .set{rev_b0_with_readout_encoding_for_topup}
 
-    topup() 
+
+    topup_files_for_eddy_topup = Channel.empty()
+
+    (topup_files_for_eddy_topup,_,_) = Topup(rev_b0_with_readout_encoding_for_topup)
+
+}
+
+workflow rest {
+    
+    
 
     dwi_for_eddy_topup.into{complex_dwi_for_eddy_topup; simple_dwi_for_eddy_topup}
 
