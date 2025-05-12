@@ -3,12 +3,12 @@ process Crop_DWI {
     label 'big_mem'
 
     input:
-    tuple value(sid), path(dwi), path(b0), path(b0_mask) from dwi_and_b0_mask_b0_for_crop
+    tuple val(sid), path(dwi), path(b0), path(b0_mask) // from dwi_and_b0_mask_b0_for_crop
 
     output:
     tuple value(sid), path("${sid}__dwi_cropped.nii.gz"),
-        path("${sid}__b0_mask_cropped.nii.gz") into dwi_mask_for_normalize
-    tuple value(sid), path("${sid}__b0_mask_cropped.nii.gz") into mask_for_resample
+        path("${sid}__b0_mask_cropped.nii.gz") //into dwi_mask_for_normalize
+    tuple value(sid), path("${sid}__b0_mask_cropped.nii.gz") // into mask_for_resample
     path("${sid}__b0_cropped.nii.gz")
 
     script:

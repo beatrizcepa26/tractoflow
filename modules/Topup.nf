@@ -19,8 +19,7 @@ process Topup {
       export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
       export OPENBLAS_NUM_THREADS=1
       export ANTS_RANDOM_SEED=1234
-      git 
-
+  
       scil_image_math.py convert $rev_b0 $rev_b0 -f --data_type float32
       scil_image_math.py convert $b0 $b0 -f --data_type float32
       scil_image_math.py concatenate $rev_b0 $rev_b0 ${sid}__concatenated_rev_b0.nii.gz

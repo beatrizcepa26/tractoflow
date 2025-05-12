@@ -3,11 +3,11 @@ process N4_DWI {
     label 'big_mem'
 
     input:
-    tuple value(sid), path(dwi), path(b0), path(b0_mask)\
-        from dwi_b0_b0_mask_for_n4
+    tuple val(sid), path(dwi), path(b0), path(b0_mask)
+        //from dwi_b0_b0_mask_for_n4
 
     output:
-    tuple value(sid), path("${sid}__dwi_n4.nii.gz") into dwi_for_crop
+    tuple val(sid), path("${sid}__dwi_n4.nii.gz") // into dwi_for_crop
 
     script:
     """

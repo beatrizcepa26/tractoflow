@@ -5,8 +5,14 @@ include {Read_BIDS} from "./modules/Read_BIDS.nf"
 include {Bet_Prelim_DWI} from "./modules/Bet_Prelim_DWI.nf"
 include {Denoise_DWI} from "./modules/Denoise_DWI.nf"
 include {Gibbs_correction} from "./modules/Gibbs_correction.nf"
-include { Prepare_for_Topup } from "./modules/Prepare_for_Topup.nf"
-include { Topup } from "./modules/Topup.nf"
+include {Prepare_for_Topup} from "./modules/Prepare_for_Topup.nf"
+include {Topup} from "./modules/Topup.nf"
+include {Prepare_dwi_for_eddy} from "./modules/Prepare_dwi_for_eddy.nf"
+include {Eddy_Topup} from ".modules/Eddy_Topup.nf"
+include {Eddy} from "./modules/Eddy.nf"
+include {Bet_DWI} from "./modules/Bet_DWI.nf"
+include {N4_DWI} from "./modules/N4_DWI.nf"
+include {Crop_DWI} from "./modules/Crop_DWI.nf"
 
 
 import groovy.json.*
@@ -707,7 +713,6 @@ workflow{
     
 
     dwi_gibbs_for_mix = Gibbs_correction(dwi_for_gibbs)
-  ///////////////////
     dwi_for_gibbs
         .map{it -> if(!params.run_gibbs_correction){it}}
         .mix(dwi_gibbs_for_mix)
@@ -788,13 +793,9 @@ workflow{
 
     (topup_files_for_eddy_topup,_,_) = Topup(rev_b0_with_readout_encoding_for_topup)
 
-}
 
-workflow rest {
-    
-    
-
-    dwi_for_eddy_topup.into{complex_dwi_for_eddy_topup; simple_dwi_for_eddy_topup}
+    dwi_for_eddy_topup.set{complex_dwi_for_eddy_topup}
+    dwi_for_eddy_topup.set{simple_dwi_for_eddy_topup}
 
     // Extract subjects with reverse DWI for Prepare_dwi_for_eddy
     complex_dwi_for_eddy_topup
@@ -816,8 +817,9 @@ workflow rest {
         .join(branch_dwi_gradient_for_prepare_dwi_for_eddy.reverse_dwi)
         .set{dwi_rev_gradient_for_prepare_dwi_for_eddy}
 
-    prepare_dwi_for_eddy() 
-
+    concatenated_dwi_for_eddy = Channel.empty()
+    
+    concatenated_dwi_for_eddy = Prepare_dwi_for_eddy(dwi_rev_gradient_for_prepare_dwi_for_eddy) 
 
     // Extract subjects with reverse b0 images for Eddy
     expl1 = Channel.value(0)
@@ -841,7 +843,8 @@ workflow rest {
         .join(readout_encoding_for_eddy_topup)
         .set{dwi_gradients_mask_topup_files_for_eddy_topup}
 
-    eddy_topup()
+
+    (dwi_from_eddy_topup,gradients_from_eddy_topup,_) = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
 
     dwi_for_eddy
         .combine(gradients_for_eddy, by: [0,1])
@@ -851,7 +854,7 @@ workflow rest {
         .join(readout_encoding_for_eddy)
         .set{dwi_gradients_mask_topup_files_for_eddy}
 
-    eddy()
+    (dwi_from_eddy, gradients_from_eddy) = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, rev_dwi_counter)
 
     dwi_for_test_eddy_topup
         .map{it -> if(!params.run_eddy){it}}
@@ -873,26 +876,31 @@ workflow rest {
     gradients_from_eddy
         .mix(gradients_from_eddy_topup)
         .mix(gradients_for_skip_eddy_topup)
-        .into{gradients_for_extract_b0;
-            gradients_for_dti_shell;
-            gradients_for_fodf_shell;
-            gradients_for_normalize;
-            gradients_for_bet;
-            gradients_for_sh_fitting_shell}
+        .set{gradients_for_extract_b0}
+    
+    gradients_for_extract_b0.set{gradients_for_dti_shell}
+    gradients_for_extract_b0.set{gradients_for_fodf_shell}
+    gradients_for_extract_b0.set{gradients_for_normalize}
+    gradients_for_extract_b0.set{gradients_for_bet}
+    gradients_for_extract_b0.set{gradients_for_sh_fitting_shell}
 
     dwi_for_bet
         .join(gradients_for_bet)
         .set{dwi_gradients_for_bet}
 
-    bet_dwi()
+    (b0_and_mask_for_crop, dwi_b0_b0_mask_for_n4, _) = Bet_DWI(dwi_gradients_for_bet)
 
-    n4_dwi() 
+    dwi_for_crop = N4_DWI(dwi_b0_b0_mask_for_n4)
 
     dwi_for_crop
         .join(b0_and_mask_for_crop)
         .set{dwi_and_b0_mask_b0_for_crop}
 
-    crop_dwi()
+    (dwi_mask_for_normalize, mask_for_resample, _) = Crop_DWI(dwi_and_b0_mask_b0_for_crop)
+}
+
+workflow rest {
+    
 
     denoise_t1() 
 
