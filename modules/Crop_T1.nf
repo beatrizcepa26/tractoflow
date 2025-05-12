@@ -2,11 +2,11 @@ process Crop_T1 {
     cpus 1
 
     input:
-    tuple value(sid), path(t1), path(t1_mask) from t1_and_mask_for_crop
+    tuple val(sid), path(t1), path(t1_mask) // from t1_and_mask_for_crop
 
     output:
-    tuple value(sid), path("${sid}__t1_bet_cropped.nii.gz"), path("${sid}__t1_bet_mask_cropped.nii.gz")\
-        into t1_and_mask_for_reg
+    tuple val(sid), path("*__t1_bet_cropped.nii.gz"), path("*__t1_bet_mask_cropped.nii.gz")
+        // into t1_and_mask_for_reg
 
     script:
     """
@@ -19,3 +19,4 @@ process Crop_T1 {
         --input_bbox t1_boundingBox.pkl -f
     scil_image_math.py convert ${sid}__t1_bet_mask_cropped.nii.gz ${sid}__t1_bet_mask_cropped.nii.gz --data_type uint8 -f
     """
+}

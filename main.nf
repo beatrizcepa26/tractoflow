@@ -13,6 +13,14 @@ include {Eddy} from "./modules/Eddy.nf"
 include {Bet_DWI} from "./modules/Bet_DWI.nf"
 include {N4_DWI} from "./modules/N4_DWI.nf"
 include {Crop_DWI} from "./modules/Crop_DWI.nf"
+include { Denoise_T1 } from "./modules/Denoise_T1.nf"
+include { N4_T1 } from "./modules/N4_T1.nf"
+include { Resample_T1 } from "./modules/Resample_T1.nf"
+include { Bet_T1 } from "./modules/Bet_T1.nf"
+ include { Crop_T1 } from "./modules/Crop_T1.nf"
+include { Normalize_DWI } from "./modules/Normalize_DWI.nf"
+include { Resample_DWI } from "./modules/Resample_DWI.nf"
+include { Extract_B0 } from "./modules/Extract_B0.nf"
 
 
 import groovy.json.*
@@ -898,54 +906,69 @@ workflow{
         .set{dwi_and_b0_mask_b0_for_crop}
 
     (dwi_mask_for_normalize, mask_for_resample, _) = Crop_DWI(dwi_and_b0_mask_b0_for_crop)
-}
 
-workflow rest {
-    
-
-    denoise_t1() 
+    t1_for_mix_n4 = Channel.empty()
+    t1_for_mix_n4 = Denoise_T1(t1_for_denoise)
 
     t1_for_test_denoise
         .map{it -> if(!params.run_t1_denoising){it}}
         .mix(t1_for_mix_n4)
         .set{t1_for_n4}
 
-    n4_t1()
+    t1_for_resample = Channel.empty()
+    t1_for_resample = N4_T1(t1_for_n4)
+    t1_for_resample.set{t1_for_test_resample}
 
-    resample_t1() 
+    t1_resampled_for_mix = Channel.empty()
+    t1_resampled_for_mix = Resample_T1(t1_for_resample) 
 
     t1_for_test_resample
         .map{it -> if(!params.run_resample_t1){it}}
         .mix(t1_resampled_for_mix)
         .set{t1_for_bet}
 
-    bet_t1() 
+    t1_and_mask_for_crop = Channel.empty()
+    t1_and_mask_for_crop = Bet_T1(t1_for_bet)
 
-    crop_t1()
-
+    t1_and_mask_for_crop = Channel.empty()
+    t1_and_mask_for_reg = Crop_T1(t1_and_mask_for_crop)
 
     dwi_mask_for_normalize
         .join(gradients_for_normalize)
         .set{dwi_mask_grad_for_normalize}
-
-    normalize_dwi() 
+    
+    dwi_for_resample = Channel.empty() 
+    dwi_for_resample = Normalize_DWI(dwi_mask_grad_for_normalize)
+    dwi_for_resample.set{dwi_for_test_resample}
 
     dwi_for_resample
         .join(mask_for_resample)
         .set{dwi_mask_for_resample}
 
-    resample_dwi() 
+    dwi_resampled_for_mix = Channel.empty()
+    dwi_resampled_for_mix = Resample_DWI(dwi_mask_for_resample)
 
     dwi_for_test_resample
         .map{it -> if(!params.run_resample_dwi){it}}
         .mix(dwi_resampled_for_mix)
-        .into{dwi_for_extract_b0; dwi_for_extract_dti_shell; dwi_for_extract_fodf_shell; dwi_for_extract_sh_fitting_shell}
+        .set{dwi_for_extract_b0}
+    
+    dwi_for_extract_b0.set{dwi_for_extract_dti_shell}
+    dwi_for_extract_b0.set{dwi_for_extract_fodf_shell}
+    dwi_for_extract_b0.set{dwi_for_extract_sh_fitting_shell}
 
     dwi_for_extract_b0
         .join(gradients_for_extract_b0)
         .set{dwi_and_grad_for_extract_b0}
+    
+    (b0_for_reg, b0_mask_for_dti_metrics) = Extract_B0(dwi_and_grad_for_extract_b0)
 
-    extract_b0() 
+    b0_mask_for_dti_metrics.set{b0_mask_for_fodf}
+    b0_mask_for_dti_metrics.set{b0_mask_for_rf}
+}
+
+workflow rest {
+    
 
     dwi_for_extract_sh_fitting_shell
         .join(gradients_for_sh_fitting_shell)

@@ -2,10 +2,10 @@ process N4_T1 {
     cpus 1
 
     input:
-    tuple value(sid), path(t1) from t1_for_n4
+    tuple val(sid), path(t1) // from t1_for_n4
 
     output:
-    tuple value(sid), path("${sid}__t1_n4.nii.gz") into t1_for_resample, t1_for_test_resample
+    tuple val(sid), path("*__t1_n4.nii.gz") //into t1_for_resample, t1_for_test_resample
 
     script:
     """

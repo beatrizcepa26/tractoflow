@@ -2,10 +2,10 @@ process Resample_T1 {
     cpus 1
 
     input:
-    tuple val(sid), path(t1) from t1_for_resample
+    tuple val(sid), path(t1) // from t1_for_resample
 
     output:
-    tuple val(sid), path("${sid}__t1_resampled.nii.gz") into t1_resampled_for_mix
+    tuple val(sid), path("*__t1_resampled.nii.gz") // into t1_resampled_for_mix
 
     when:
     params.run_resample_t1
