@@ -8,7 +8,7 @@ include {Gibbs_correction} from "./modules/Gibbs_correction.nf"
 include {Prepare_for_Topup} from "./modules/Prepare_for_Topup.nf"
 include {Topup} from "./modules/Topup.nf"
 include {Prepare_dwi_for_eddy} from "./modules/Prepare_dwi_for_eddy.nf"
-include {Eddy_Topup} from ".modules/Eddy_Topup.nf"
+include {Eddy_Topup} from "./modules/Eddy_Topup.nf"
 include {Eddy} from "./modules/Eddy.nf"
 include {Bet_DWI} from "./modules/Bet_DWI.nf"
 include {N4_DWI} from "./modules/N4_DWI.nf"
@@ -887,6 +887,7 @@ workflow{
     dwi_for_bet
         .join(gradients_for_bet)
         .set{dwi_gradients_for_bet}
+    
 
     (b0_and_mask_for_crop, dwi_b0_b0_mask_for_n4, _) = Bet_DWI(dwi_gradients_for_bet)
 

@@ -6,11 +6,11 @@ process Bet_DWI {
     tuple val(sid), path(dwi), path(bval), path(bvec) //from dwi_gradients_for_bet
 
     output:
-    tuple val(sid), "${sid}__b0_bet.nii.gz", "${sid}__b0_bet_mask.nii.gz" 
+    tuple val(sid), path("*__b0_bet.nii.gz"), path("*__b0_bet_mask.nii.gz") 
         // into b0_and_mask_for_crop
-    tuple val(sid), "${sid}__dwi_bet.nii.gz", "${sid}__b0_bet.nii.gz",
-        "${sid}__b0_bet_mask.nii.gz" // into dwi_b0_b0_mask_for_n4
-    path("${sid}__b0_no_bet.nii.gz")
+    tuple val(sid), path("*__dwi_bet.nii.gz"), path("*__b0_bet.nii.gz"),
+        path("*__b0_bet_mask.nii.gz") // into dwi_b0_b0_mask_for_n4
+    path("*__b0_no_bet.nii.gz")
 
     script:
     """

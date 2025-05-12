@@ -5,7 +5,7 @@ process Gibbs_correction {
     tuple val(sid), val(rev), path(dwi)  //from dwi_for_gibbs
 
     output:
-    tuple val(sid), val(rev), path("${sid}_${rev}dwi_gibbs_corrected.nii.gz") //into         dwi_gibbs_for_mix
+    tuple val(sid), val(rev), path("${sid}_${rev}dwi_gibbs_corrected.nii.gz") //into dwi_gibbs_for_mix
 
     when:
         params.run_gibbs_correction

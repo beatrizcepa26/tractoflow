@@ -7,7 +7,7 @@ process N4_DWI {
         //from dwi_b0_b0_mask_for_n4
 
     output:
-    tuple val(sid), path("${sid}__dwi_n4.nii.gz") // into dwi_for_crop
+    tuple val(sid), path("*__dwi_n4.nii.gz") // into dwi_for_crop
 
     script:
     """
