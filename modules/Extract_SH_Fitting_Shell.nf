@@ -2,13 +2,13 @@ process Extract_SH_Fitting_Shell {
     cpus 3
 
     input:
-    tuple value(sid), path(dwi), path(bval), path(bvec)\
-        from dwi_and_grad_for_extract_sh_fitting_shell
+    tuple val(sid), path(dwi), path(bval), path(bvec)\
+        //from dwi_and_grad_for_extract_sh_fitting_shell
 
     output:
-    tuple value(sid), path("${sid}__dwi_sh_fitting.nii.gz"), path("${sid}__bval_sh_fitting"),
-        path("${sid}__bvec_sh_fitting") into \
-        dwi_and_grad_for_sh_fitting
+    tuple val(sid), path("*__dwi_sh_fitting.nii.gz"), path("*__bval_sh_fitting"),
+        path("*__bvec_sh_fitting") 
+        //into dwi_and_grad_for_sh_fitting
 
     when:
     params.sh_fitting

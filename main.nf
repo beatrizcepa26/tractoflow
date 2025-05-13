@@ -17,10 +17,15 @@ include { Denoise_T1 } from "./modules/Denoise_T1.nf"
 include { N4_T1 } from "./modules/N4_T1.nf"
 include { Resample_T1 } from "./modules/Resample_T1.nf"
 include { Bet_T1 } from "./modules/Bet_T1.nf"
- include { Crop_T1 } from "./modules/Crop_T1.nf"
+include { Crop_T1 } from "./modules/Crop_T1.nf"
 include { Normalize_DWI } from "./modules/Normalize_DWI.nf"
 include { Resample_DWI } from "./modules/Resample_DWI.nf"
 include { Extract_B0 } from "./modules/Extract_B0.nf"
+include { Extract_SH_Fitting_Shell } from "./modules/Extract_SH_Fitting_Shell.nf"
+include { SH_Fitting } from "./modules/SH_Fitting.nf"
+include { Extract_DTI_Shell } from "./modules/Extract_DTI_Shell.nf"
+include { DTI_Metrics } from "./modules/DTI_Metrics.nf"
+include { Extract_FODF_Shell } from "./modules/Extract_FODF_Shell.nf"
 
 
 import groovy.json.*
@@ -965,41 +970,52 @@ workflow{
 
     b0_mask_for_dti_metrics.set{b0_mask_for_fodf}
     b0_mask_for_dti_metrics.set{b0_mask_for_rf}
-}
-
-workflow rest {
     
-
     dwi_for_extract_sh_fitting_shell
         .join(gradients_for_sh_fitting_shell)
         .set{dwi_and_grad_for_extract_sh_fitting_shell}
 
-    extract_sh_fitting_shell()
+    dwi_and_grad_for_sh_fitting = Channel.empty()
+    dwi_and_grad_for_sh_fitting = Extract_SH_Fitting_Shell(dwi_and_grad_for_extract_sh_fitting_shell)
 
-    sh_fitting_workflow()
+    SH_Fitting(dwi_and_grad_for_sh_fitting)
 
     dwi_for_extract_dti_shell
         .join(gradients_for_dti_shell)
         .set{dwi_and_grad_for_extract_dti_shell}
 
-    extract_dti_shell()
+    dwi_and_grad_for_dti_metrics =  Channel.empty()
+    dwi_and_grad_for_dti_metrics = Extract_DTI_Shell(dwi_and_grad_for_extract_dti_shell)
+    dwi_and_grad_for_dti_metrics.set{dwi_and_grad_for_rf}
 
     dwi_and_grad_for_dti_metrics
         .join(b0_mask_for_dti_metrics)
         .set{dwi_and_grad_for_dti_metrics}
 
-    dti_metrics() 
+    def dti_metrics_results = DTI_Metrics(dwi_and_grad_for_dti_metrics)
+    def fa_md_for_fodf = dti_metrics_results.fa_md_for_fodf
+    def fa_for_reg = dti_metrics_results.fa_for_reg
+    def fa_for_pft_tracking = dti_metrics_results.fa_for_reg
+    def fa_for_local_tracking_mask = dti_metrics_results.fa_for_reg
+    def fa_for_local_seeding_mask = dti_metrics_results.fa_for_reg
 
     dwi_for_extract_fodf_shell
         .join(gradients_for_fodf_shell)
         .set{dwi_and_grad_for_extract_fodf_shell}
 
-    extract_fodf_shell()
+    def dwi_and_grad_for_fodf = Extract_FODF_Shell(dwi_and_grad_for_extract_fodf_shell)
 
     t1_and_mask_for_reg
         .join(fa_for_reg)
         .join(b0_for_reg)
         .set{t1_fa_b0_for_reg}
+
+
+}
+
+workflow rest {
+    
+
 
     register_t1() 
 

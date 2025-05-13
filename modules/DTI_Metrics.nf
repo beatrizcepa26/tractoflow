@@ -3,8 +3,8 @@ process DTI_Metrics {
     label 'big_mem'
 
     input:
-    tuple value(sid), path(dwi), path(bval), path(bvec), path(b0_mask)\
-        from dwi_and_grad_for_dti_metrics
+    tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
+        // from dwi_and_grad_for_dti_metrics
 
     output:
     path("${sid}__ad.nii.gz")
@@ -33,9 +33,9 @@ process DTI_Metrics {
     path("${sid}__residual_q3_residuals.npy")
     path("${sid}__residual_residuals_stats.png")
     path("${sid}__residual_std_residuals.npy")
-    tuple value(sid), path("${sid}__fa.nii.gz"), path("${sid}__md.nii.gz") into fa_md_for_fodf
-    tuple value(sid), path("${sid}__fa.nii.gz") into\
-        fa_for_reg, fa_for_pft_tracking, fa_for_local_tracking_mask, fa_for_local_seeding_mask
+    tuple val(sid), path("${sid}__fa.nii.gz"), path("${sid}__md.nii.gz"), emit: fa_md_for_fodf
+    tuple val(sid), path("${sid}__fa.nii.gz"), emit: fa_for_reg
+        //fa_for_reg, fa_for_pft_tracking, fa_for_local_tracking_mask, fa_for_local_seeding_mask
 
     script:
     """

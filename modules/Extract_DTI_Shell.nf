@@ -3,14 +3,14 @@ process Extract_DTI_Shell {
     label 'big_mem'
 
     input:
-    tuple value(sid), path(dwi), path(bval), path(bvec)\
-        from dwi_and_grad_for_extract_dti_shell
+    tuple val(sid), path(dwi), path(bval), path(bvec)
+        //from dwi_and_grad_for_extract_dti_shell
 
     output:
-    tuple value(sid), path("${sid}__dwi_dti.nii.gz"), path("${sid}__bval_dti"),
-        path("${sid}__bvec_dti") into \
-        dwi_and_grad_for_dti_metrics, \
-        dwi_and_grad_for_rf
+    tuple val(sid), path("${sid}__dwi_dti.nii.gz"), path("${sid}__bval_dti"),
+        path("${sid}__bvec_dti") 
+        //into dwi_and_grad_for_dti_metrics, \
+        // dwi_and_grad_for_rf
 
     script:
     if (params.dti_shells)
