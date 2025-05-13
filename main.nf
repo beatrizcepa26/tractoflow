@@ -992,7 +992,9 @@ workflow{
         .join(b0_mask_for_dti_metrics)
         .set{dwi_and_grad_for_dti_metrics}
 
-    def dti_metrics_results = DTI_Metrics(dwi_and_grad_for_dti_metrics)
+
+    dti_metrics_results = Channel.empty()
+    dti_metrics_results = DTI_Metrics(dwi_and_grad_for_dti_metrics)
     def fa_md_for_fodf = dti_metrics_results.fa_md_for_fodf
     def fa_for_reg = dti_metrics_results.fa_for_reg
     def fa_for_pft_tracking = dti_metrics_results.fa_for_reg
@@ -1003,7 +1005,9 @@ workflow{
         .join(gradients_for_fodf_shell)
         .set{dwi_and_grad_for_extract_fodf_shell}
 
-    def dwi_and_grad_for_fodf = Extract_FODF_Shell(dwi_and_grad_for_extract_fodf_shell)
+    
+    dwi_and_grad_for_fodf = Channel.empty()
+    dwi_and_grad_for_fodf = Extract_FODF_Shell(dwi_and_grad_for_extract_fodf_shell)
 
     t1_and_mask_for_reg
         .join(fa_for_reg)
