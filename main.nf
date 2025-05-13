@@ -26,228 +26,23 @@ include { SH_Fitting } from "./modules/SH_Fitting.nf"
 include { Extract_DTI_Shell } from "./modules/Extract_DTI_Shell.nf"
 include { DTI_Metrics } from "./modules/DTI_Metrics.nf"
 include { Extract_FODF_Shell } from "./modules/Extract_FODF_Shell.nf"
-
+include { Register_T1 } from "./modules/Register_T1.nf"
+include { Register_Freesurfer } from "./modules/Register_Freesurfer.nf"
+include { Segment_Freesurfer } from "./modules/Segment_Freesurfer.nf"
+include { Segment_Tissues } from "./modules/Segment_Tissues.nf"
+include { Compute_FRF } from "./modules/Compute_FRF.nf"
+include { Mean_FRF } from "./modules/Mean_FRF.nf"
+include { FODF_Metrics } from "./modules/FODF_Metrics.nf"
+include { PFT_Tracking_Maps } from "./modules/PFT_Tracking_Maps.nf"
+include { PFT_Seeding_Mask } from "./modules/PFT_Seeding_Mask.nf"
+include { PFT_Tracking } from "./modules/PFT_Tracking.nf"
+include { Local_Tracking_Mask } from "./modules/Local_Tracking_Mask.nf"
+include { Local_Seeding_Mask } from "./modules/Local_Seeding_Mask.nf"
+include { Local_Tracking } from "./modules/Local_Tracking.nf"
 
 import groovy.json.*
 
 // ---------------- Workflows of processes -------------------
-
-
-
-workflow gibbs_correction {
-    include {Gibbs_correction} from "./modules/Gibbs_correction.nf"
-    dwi_gibbs_for_mix = Gibbs_correction(dwi_for_gibbs: dwi_for_gibbs)
-}
-
-
-workflow prepare_for_topup {
-    include { Prepare_for_Topup } from "./modules/Prepare_for_Topup.nf"
-    simple_b0_for_topup = Prepare_for_Topup(dwi_gradients_rev_b0_for_prepare_topup: dwi_gradients_rev_b0_for_prepare_topup)
-}
-
-
-workflow topup {
-    include { Topup } from "./modules/Topup.nf"
-    topup_files_for_eddy_topup = Topup(rev_b0_with_readout_encoding_for_topup: rev_b0_with_readout_encoding_for_topup)
-}
-
-
-workflow prepare_dwi_for_eddy {
-    include { Prepare_dwi_for_eddy } from "./modules/Prepare_dwi_for_eddy.nf"
-    concatenated_dwi_for_eddy = Prepare_dwi_for_eddy(dwi_rev_gradient_for_prepare_dwi_for_eddy: dwi_rev_gradient_for_prepare_dwi_for_eddy)
-}
-
-
-workflow eddy_topup {
-    include { Eddy_Topup } from "./modules/Eddy_Topup.nf"
-    // eddy_topup_results = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup: dwi_gradients_mask_topup_files_for_eddy_topup,
-    // rev_b0_count: rev_b0_counter,
-    // rev_dwi_count: rev_dwi_counter,)
-}
-
-
-workflow eddy{
-    include { Eddy } from "./modules/Eddy.nf"
-    // dwi_from_eddy_topup = Eddy(dwi_gradients_mask_topup_files_for_eddy: dwi_gradients_mask_topup_files_for_eddy,
-    //     rev_b0_count: rev_b0_counter,
-    //     rev_dwi_count: rev_dwi_counter)
-}
-
-
-workflow bet_dwi {
-    include { Bet_DWI } from "./modules/Bet_DWI.nf"
-    // b0_and_mask_for_crop = Bet_DWI(dwi_gradients_for_bet: dwi_gradients_for_bet)
-}
-
-
-workflow n4_dwi {
-    include { N4_DWI } from "./modules/N4_DWI.nf"
-    dwi_for_crop = N4_DWI(dwi_b0_b0_mask_for_n4: dwi_b0_b0_mask_for_n4)
-}
-
-
-workflow crop_dwi {
-    include { Crop_DWI } from "./modules/Crop_DWI.nf"
-    // dwi_mask_for_normalize = Crop_DWI(dwi_and_b0_mask_b0_for_crop: dwi_and_b0_mask_b0_for_crop)
-}
-
-
-workflow denoise_t1 {
-    include { Denoise_T1 } from "./modules/Denoise_T1.nf"
-    t1_for_mix_n4 = Denoise_T1(t1_for_denoise: t1_for_denoise)
-}
-
-
-workflow n4_t1 {
-    include { N4_T1 } from "./modules/N4_T1.nf"
-    // t1_for_bet = N4_T1(t1_for_n4: t1_for_n4)
-}
-
-
-workflow resample_t1 {
-    include { Resample_T1 } from "./modules/Resample_T1.nf"
-    // t1_resampled_for_mix = Resample_T1(t1_for_bet: t1_for_bet)
-}
-
-
-workflow bet_t1 {
-    include { Bet_T1 } from "./modules/Bet_T1.nf"
-    // t1_and_mask_for_crop = Bet_T1(t1_for_bet: t1_for_bet)
-}
-
-
-workflow crop_t1 {
-    include { Crop_T1 } from "./modules/Crop_T1.nf"
-    // t1_and_mask_for_reg = Crop_T1(t1_and_mask_for_crop: t1_and_mask_for_crop)
-}
-
-
-workflow normalize_dwi{
-    include { Normalize_DWI } from "./modules/Normalize_DWI.nf"
-    // dwi_for_resample = Normalize_DWI(dwi_mask_for_normalize: dwi_mask_for_normalize)
-}
-
-
-workflow resample_dwi {
-    include { Resample_DWI } from "./modules/Resample_DWI.nf"
-    // dwi_for_mix = Resample_DWI(dwi_mask_for_resample: dwi_mask_for_resample)
-}
-
-
-workflow extract_b0 {
-    include { Extract_B0 } from "./modules/Extract_B0.nf"
-    // b0_for_reg = Extract_B0(dwi_and_grad_for_extract_b0: dwi_and_grad_for_extract_b0)
-}
-
-
-workflow extract_sh_fitting_shell{
-    include { Extract_SH_Fitting_Shell } from "./modules/Extract_SH_Fitting_Shell.nf"
-    // dwi_and_grad_for_sh_fitting = Extract_SH_Fitting_Shell(dwi_and_grad_for_extract_sh_fitting_shell: dwi_and_grad_for_extract_sh_fitting_shell)
-}
-
-
-workflow sh_fitting_workflow {
-    include { SH_Fitting } from "./modules/SH_Fitting.nf"
-    // SH_Fitting(dwi_and_grad_for_sh_fitting: dwi_and_grad_for_sh_fitting)
-}
-
-
-workflow extract_dti_shell{
-    include { Extract_DTI_Shell } from "./modules/Extract_DTI_Shell.nf"
-    // dwi_and_grad_for_dti_metrics = Extract_DTI_Shell(dwi_and_grad_for_extract_dti_shell: dwi_and_grad_for_extract_dti_shell)
-}
-
-
-workflow dti_metrics{
-    include { DTI_Metrics } from "./modules/DTI_Metrics.nf"
-    // DTI_Metrics(dwi_and_grad_for_dti_metrics: dwi_and_grad_for_dti_metrics)
-}
-
-
-workflow extract_fodf_shell{
-    include { FODF_Metrics } from "./modules/FODF_Metrics.nf"
-    // FODF_Metrics(dwi_and_grad_for_fodf_metrics: dwi_and_grad_for_fodf_metrics)
-}
-
-
-workflow register_t1{
-    include { Register_T1 } from "./modules/Register_T1.nf"
-    // Register_T1(t1_and_mask_for_reg: t1_and_mask_for_reg)
-}
-
-
-workflow register_freesurfer{
-    include { Register_Freesurfer } from "./modules/Register_Freesurfer.nf"
-    // labels_for_segmentation = Register_Freesurfer(labels_mat_for_reg: labels_mat_for_reg)
-}
-
-
-workflow segment_freesurfer{
-    include { Segment_Freesurfer } from "./modules/Segment_Freesurfer.nf"
-    // wm_mask_freesurfer = Segment_Freesurfer(labels_for_segmentation: labels_for_segmentation)
-}
-
-
-workflow segment_tissues{
-    include { Segment_Tissues } from "./modules/Segment_Tissues.nf"
-    // Segment_Tissues(t1_for_seg: t1_for_seg)
-}
-
-
-workflow compute_frf{
-    include { Compute_FRF } from "./modules/Compute_FRF.nf"
-    // Compute_FRF(dwi_b0_for_rf: dwi_b0_for_rf)
-}
-
-
-workflow mean_frf_workflow{
-    include { Mean_FRF } from "./modules/Mean_FRF.nf"
-    // mean_frf = Mean_FRF(all_frf_for_mean_frf: all_frf_for_mean_frf)
-}
-
-
-workflow fodf_metrics{
-    include { FODF_Metrics } from "./modules/FODF_Metrics.nf"
-    // FODF_Metrics(dwi_b0_metrics_frf_for_fodf: dwi_b0_metrics_frf_for_fodf)
-}
-
-
-workflow pft_tracking_maps{
-    include { PFT_Tracking_Maps } from "./modules/PFT_Tracking_Maps.nf"
-    // PFT_Tracking_Maps(map_wm_gm_csf_for_pft_maps: map_wm_gm_csf_for_pft_maps)
-}
-
-
-workflow pft_seeding_mask{
-    include { PFT_Seeding_Mask } from "./modules/PFT_Seeding_Mask.nf"
-    // seeding_mask_for_pft = PFT_Seeding_Mask(wm_fa_int_for_pft: wm_fa_int_for_pft)
-}
-
-
-workflow pft_tracking{
-    include { PFT_Tracking } from "./modules/PFT_Tracking.nf"
-    // PFT_Tracking(fodf_maps_for_pft_tracking: fodf_maps_for_pft_tracking,
-    //     pft_random_seed: pft_random_seed)
-}
-
-
-workflow local_tracking_mask{
-    include { Local_Tracking_Mask } from "./modules/Local_Tracking_Mask.nf"
-    // tracking_mask_for_local = Local_Tracking_Mask(wm_fa_for_local_tracking_mask: wm_fa_for_local_tracking_mask)
-}
-
-
-workflow local_seeding_mask{
-    include { Local_Seeding_Mask } from "./modules/Local_Seeding_Mask.nf"
-    // tracking_seeding_mask_for_local = Local_Seeding_Mask(wm_fa_for_local_seeding_mask: wm_fa_for_local_seeding_mask)
-}
-
-
-workflow local_tracking{
-    include { Local_Tracking } from "./modules/Local_Tracking.nf"
-    // Local_Tracking(fodf_maps_for_local_tracking: fodf_maps_for_local_tracking,
-    //     local_random_seed: local_random_seed)
-}
 
 
 // ---------------- Main workflow -------------------
@@ -1014,40 +809,42 @@ workflow{
         .join(b0_for_reg)
         .set{t1_fa_b0_for_reg}
 
+   (t1_for_seg, t1_for_freesurfer_reg,_,_) = Register_T1(t1_fa_b0_for_reg)
 
-}
-
-workflow rest {
-    
-
-
-    register_t1() 
-
-    labels_for_reg
+   labels_for_reg
         .join(t1_for_freesurfer_reg)
         .set{labels_mat_for_reg}
+    
+    labels_for_segmentation = Channel.empty()
+    labels_for_segmentation = Register_Freesurfer(labels_mat_for_reg)
 
-    register_freesurfer()
+    (wm_mask_freesurfer,_,_) = Segment_Freesurfer(labels_for_segmentation)
 
-    segment_freesurfer() 
+    (map_wm_gm_csf_for_pft_maps, wm_mask_for_pft_tracking,_,_) = Segment_Tissues(t1_for_seg)
 
-    segment_tissues() 
+    wm_mask_for_pft_tracking.set{wm_mask_for_pft_tracking}
+
 
     wm_mask_freesurfer
         .concat(wm_mask_fast)
-        .into{wm_mask_for_local_tracking_mask;wm_mask_for_local_seeding_mask}
+        .into{wm_mask_for_local_tracking_mask}
+    
+    wm_mask_for_local_tracking_mask.set{wm_mask_for_local_seeding_mask}
 
     dwi_and_grad_for_rf
         .join(b0_mask_for_rf)
         .set{dwi_b0_for_rf}
+    
+    (unique_frf, all_frf_to_collect) = Compute_FRF(dwi_b0_for_rf)
 
-    compute_frf() 
+    unique_frf.set{unique_frf_for_mean}
 
     all_frf_to_collect
         .collect()
         .set{all_frf_for_mean_frf}
 
-    mean_frf_workflow() 
+    mean_frf = Channel.empty()
+    mean_frf = Mean_FRF(all_frf_for_mean_frf)
 
     frf_for_fodf = unique_frf
 
@@ -1062,44 +859,52 @@ workflow rest {
         .join(fa_md_for_fodf)
         .join(frf_for_fodf)
         .set{dwi_b0_metrics_frf_for_fodf}
+    
+    fodfs_m = Channel.empty()
+    fodfs_m = FODF_Metrics(dwi_b0_metrics_frf_for_fodf)
+    def fodf_for_pft_tracking = fodfs_m.fodf_for_pft_tracking
+    def fodf_for_local_tracking = fodfs_m.fodf_for_pft_tracking
 
-    fodf_metrics() 
-
-    pft_tracking_maps() 
+    (pft_maps_for_pft_tracking, interface_for_pft_seeding_mask) = PFT_Tracking_Maps(map_wm_gm_csf_for_pft_maps)
 
     wm_mask_for_pft_tracking
         .join(fa_for_pft_tracking)
         .join(interface_for_pft_seeding_mask)
         .set{wm_fa_int_for_pft}
 
-    pft_seeding_mask()
+    seeding_mask_for_pft = Channel.empty()
+    seeding_mask_for_pft = PFT_Seeding_Mask(wm_fa_int_for_pft)
 
     fodf_for_pft_tracking
         .join(pft_maps_for_pft_tracking)
         .join(seeding_mask_for_pft)
         .set{fodf_maps_for_pft_tracking}
-
-    pft_tracking() 
+    
+    PFT_Tracking(fodf_maps_for_pft_tracking,curr_seed)
 
     wm_mask_for_local_tracking_mask
         .join(fa_for_local_tracking_mask)
         .set{wm_fa_for_local_tracking_mask}
 
-    local_tracking_mask() 
+    tracking_mask_for_local = Channel.empty()
+    tracking_mask_for_local = Local_Tracking_Mask(wm_fa_for_local_tracking_mask)
 
     wm_mask_for_local_seeding_mask
         .join(fa_for_local_seeding_mask)
         .set{wm_fa_for_local_seeding_mask}
 
-    local_seeding_mask() 
+    tracking_seeding_mask_for_local = Channel.empty()
+    tracking_seeding_mask_for_local = Local_Seeding_Mask(wm_fa_for_local_seeding_mask)
 
     fodf_for_local_tracking
         .join(tracking_mask_for_local)
         .join(tracking_seeding_mask_for_local)
         .set{fodf_maps_for_local_tracking}
-
-    local_tracking()
+    
+    Local_Tracking(fodf_maps_for_local_tracking, curr_seed)
 }
+
+
 
 workflow.onComplete {
         log.info "Pipeline completed at: $workflow.complete"

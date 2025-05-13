@@ -2,10 +2,10 @@ process Local_Tracking_Mask {
     cpus 1
 
     input:
-    tuple value(sid), path(wm), path(fa) from wm_fa_for_local_tracking_mask
+    tuple val(sid), path(wm), path(fa) // from wm_fa_for_local_tracking_mask
 
     output:
-    tuple value(sid), path("${sid}__local_tracking_mask.nii.gz") into tracking_mask_for_local
+    tuple val(sid), path("${sid}__local_tracking_mask.nii.gz") // into tracking_mask_for_local
 
     when:
         params.run_local_tracking

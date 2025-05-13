@@ -3,9 +3,9 @@ process Local_Tracking {
     memory { 5.GB * task.attempt }
 
     input:
-    tuple value(sid), path(fodf), path(tracking_mask), path(seed)\
-        from fodf_maps_for_local_tracking
-    each curr_seed from local_random_seed
+    tuple val(sid), path(fodf), path(tracking_mask), path(seed)\
+        // from fodf_maps_for_local_tracking
+    each curr_seed //from local_random_seed
 
     output:
     path("${sid}__local_tracking_${params.local_algo}_${params.local_seeding_mask_type}_seeding_${params.local_tracking_mask_type}_mask_seed_${curr_seed}.trk")

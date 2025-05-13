@@ -2,12 +2,12 @@ process PFT_Tracking_Maps {
     cpus 1
 
     input:
-    tuple value(sid), path(wm), path(gm), path(csf) from map_wm_gm_csf_for_pft_maps
+    tuple val(sid), path(wm), path(gm), path(csf) // from map_wm_gm_csf_for_pft_maps
 
     output:
-    tuple value(sid), path("${sid}__map_include.nii.gz"),
-        path("${sid}__map_exclude.nii.gz") into pft_maps_for_pft_tracking
-    tuple value(sid), path("${sid}__interface.nii.gz") into interface_for_pft_seeding_mask
+    tuple val(sid), path("${sid}__map_include.nii.gz"),
+        path("${sid}__map_exclude.nii.gz") // into pft_maps_for_pft_tracking
+    tuple val(sid), path("${sid}__interface.nii.gz") // into interface_for_pft_seeding_mask
 
     when:
         params.run_pft_tracking

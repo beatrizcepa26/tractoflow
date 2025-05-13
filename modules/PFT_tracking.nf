@@ -2,9 +2,9 @@ process PFT_Tracking {
     cpus 2
 
     input:
-    tuple value(sid), path(fodf), path(include), path(exclude), path(seed)\
-        from fodf_maps_for_pft_tracking
-    each curr_seed from pft_random_seed
+    tuple val(sid), path(fodf), path(include), path(exclude), path(seed)
+        //from fodf_maps_for_pft_tracking
+    each curr_seed //from pft_random_seed
 
     output:
     path("${sid}__pft_tracking_${params.pft_algo}_${params.pft_seeding_mask_type}_seed_${curr_seed}.trk")

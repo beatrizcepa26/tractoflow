@@ -2,12 +2,12 @@ process Segment_Tissues {
     cpus 1
 
     input:
-    tuple val(sid), path(t1) from t1_for_seg
+    tuple val(sid), path(t1) // from t1_for_seg
 
     output:
     tuple val(sid), path("${sid}__map_wm.nii.gz"), path("${sid}__map_gm.nii.gz"),
-        path("${sid}__map_csf.nii.gz") into map_wm_gm_csf_for_pft_maps
-    tuple val(sid), path("${sid}__mask_wm.nii.gz") into wm_mask_for_pft_tracking, wm_mask_fast
+        path("${sid}__map_csf.nii.gz") //into map_wm_gm_csf_for_pft_maps
+    tuple val(sid), path("${sid}__mask_wm.nii.gz") //into wm_mask_for_pft_tracking, wm_mask_fast
     path("${sid}__mask_gm.nii.gz")
     path("${sid}__mask_csf.nii.gz")
 

@@ -2,12 +2,12 @@ process Register_T1 {
     cpus params.processes_registration
 
     input:
-    tuple val(sid), path(t1), path(t1_mask), path(fa), path(b0) from t1_fa_b0_for_reg
+    tuple val(sid), path(t1), path(t1_mask), path(fa), path(b0) // from t1_fa_b0_for_reg
 
     output:
-    tuple val(sid), path("${sid}__t1_warped.nii.gz") into t1_for_seg
+    tuple val(sid), path("${sid}__t1_warped.nii.gz") // into t1_for_seg
     tuple val(sid), path("${sid}__t1_warped.nii.gz"), path("${sid}__output0GenericAffine.mat"),
-        path("${sid}__output1Warp.nii.gz") into t1_for_freesurfer_reg
+        path("${sid}__output1Warp.nii.gz") // into t1_for_freesurfer_reg
     path("${sid}__output1InverseWarp.nii.gz")
     path("${sid}__t1_mask_warped.nii.gz")
 
