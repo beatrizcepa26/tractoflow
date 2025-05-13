@@ -880,7 +880,7 @@ workflow{
         .join(seeding_mask_for_pft)
         .set{fodf_maps_for_pft_tracking}
     
-    PFT_Tracking(fodf_maps_for_pft_tracking,curr_seed)
+    PFT_Tracking(fodf_maps_for_pft_tracking,pft_random_seed)
 
     wm_mask_for_local_tracking_mask
         .join(fa_for_local_tracking_mask)
@@ -901,7 +901,7 @@ workflow{
         .join(tracking_seeding_mask_for_local)
         .set{fodf_maps_for_local_tracking}
     
-    Local_Tracking(fodf_maps_for_local_tracking, curr_seed)
+    Local_Tracking(fodf_maps_for_local_tracking, local_random_seed)
 }
 
 
