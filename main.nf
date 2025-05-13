@@ -827,7 +827,7 @@ workflow{
 
     wm_mask_freesurfer
         .concat(wm_mask_fast)
-        .into{wm_mask_for_local_tracking_mask}
+        .set{wm_mask_for_local_tracking_mask}
     
     wm_mask_for_local_tracking_mask.set{wm_mask_for_local_seeding_mask}
 
