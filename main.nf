@@ -822,7 +822,7 @@ workflow{
 
     (map_wm_gm_csf_for_pft_maps, wm_mask_for_pft_tracking,_,_) = Segment_Tissues(t1_for_seg)
 
-    wm_mask_for_pft_tracking.set{wm_mask_for_pft_tracking}
+    wm_mask_for_pft_tracking.set{wm_mask_fast}
 
 
     wm_mask_freesurfer
