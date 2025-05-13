@@ -937,8 +937,8 @@ workflow{
         .join(gradients_for_normalize)
         .set{dwi_mask_grad_for_normalize}
     
-    dwi_for_resample = Channel.empty() 
-    dwi_for_resample = Normalize_DWI(dwi_mask_grad_for_normalize)
+    
+    (dwi_for_resample,_) = Normalize_DWI(dwi_mask_grad_for_normalize)
     dwi_for_resample.set{dwi_for_test_resample}
 
     dwi_for_resample
