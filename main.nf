@@ -467,19 +467,22 @@ workflow{
     dwi_for_denoise = all_info_ch.map{it[0]}
     dwi_for_test_denoise = all_info_ch.map{it[0]}
     truc = all_info_ch.map{it[0]}
+    pft_random_seed = Channel.empty()
+    local_random_seed = Channel.empty()
+
 
     if (params.pft_random_seed instanceof String){
-        def pft_random_seed = params.pft_random_seed?.tokenize(',')
+        pft_random_seed = params.pft_random_seed?.tokenize(',')
     }
     else{
-        def pft_random_seed = params.pft_random_seed
+        pft_random_seed = params.pft_random_seed
     }
 
     if (params.local_random_seed instanceof String){
-        def local_random_seed = params.local_random_seed?.tokenize(',')
+        local_random_seed = params.local_random_seed?.tokenize(',')
     }
     else{
-        def local_random_seed = params.local_random_seed
+        local_random_seed = params.local_random_seed
     }
 
     gradients_for_prelim_bet = all_info_ch.map{it[1]}
