@@ -469,17 +469,17 @@ workflow{
     truc = all_info_ch.map{it[0]}
 
     if (params.pft_random_seed instanceof String){
-        pft_random_seed = params.pft_random_seed?.tokenize(',')
+        def pft_random_seed = params.pft_random_seed?.tokenize(',')
     }
     else{
-        pft_random_seed = params.pft_random_seed
+        def pft_random_seed = params.pft_random_seed
     }
 
     if (params.local_random_seed instanceof String){
-        local_random_seed = params.local_random_seed?.tokenize(',')
+        def local_random_seed = params.local_random_seed?.tokenize(',')
     }
     else{
-        local_random_seed = params.local_random_seed
+        def local_random_seed = params.local_random_seed
     }
 
     gradients_for_prelim_bet = all_info_ch.map{it[1]}
