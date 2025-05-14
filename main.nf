@@ -668,8 +668,8 @@ if(params.help) {
         .set{dwi_gradients_mask_topup_files_for_eddy_topup}
         
     
-
-    if ((rev_b0_counter > 0 || rev_dwi_counter > 0) && params.run_topup && params.run_eddy){
+    // > -> != for syntax motives
+    if ((rev_b0_counter != 0 || rev_dwi_counter != 0) && params.run_topup && params.run_eddy){ 
         (dwi_from_eddy_topup,gradients_from_eddy_topup,_) = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
     }
 
@@ -733,8 +733,8 @@ if(params.help) {
 
     (dwi_mask_for_normalize, mask_for_resample, _) = Crop_DWI(dwi_and_b0_mask_b0_for_crop)
 
+    t1_for_mix_n4 = Channel.empty()
     if (params.run_t1_denoising){
-        t1_for_mix_n4 = Channel.empty()
         t1_for_mix_n4 = Denoise_T1(t1_for_denoise)
     }
 
@@ -747,8 +747,8 @@ if(params.help) {
     t1_for_resample = N4_T1(t1_for_n4)
     t1_for_resample.set{t1_for_test_resample}
 
+    t1_resampled_for_mix = Channel.empty()
     if (params.run_resample_t1){
-        t1_resampled_for_mix = Channel.empty()
         t1_resampled_for_mix = Resample_T1(t1_for_resample)
     }
 
@@ -775,8 +775,8 @@ if(params.help) {
         .join(mask_for_resample)
         .set{dwi_mask_for_resample}
 
+    dwi_resampled_for_mix = Channel.empty()
     if (params.run_resample_dwi){
-        dwi_resampled_for_mix = Channel.empty()
         dwi_resampled_for_mix = Resample_DWI(dwi_mask_for_resample)
     }
 
@@ -802,8 +802,9 @@ if(params.help) {
         .join(gradients_for_sh_fitting_shell)
         .set{dwi_and_grad_for_extract_sh_fitting_shell}
 
+    dwi_and_grad_for_sh_fitting = Channel.empty()
     if (params.sh_fitting){
-        dwi_and_grad_for_sh_fitting = Channel.empty()
+        
         dwi_and_grad_for_sh_fitting = Extract_SH_Fitting_Shell(dwi_and_grad_for_extract_sh_fitting_shell)
 
         SH_Fitting(dwi_and_grad_for_sh_fitting)
@@ -882,8 +883,9 @@ if(params.help) {
         .collect()
         .set{all_frf_for_mean_frf}
 
+    mean_frf = Channel.empty()
     if (params.mean_frf && !params.set_frf){
-        mean_frf = Channel.empty()
+        
         mean_frf = Mean_FRF(all_frf_for_mean_frf)
     }
 
