@@ -10,8 +10,8 @@ process Topup {
       file "${sid}__rev_b0_warped.nii.gz"
       file "${sid}__rev_b0_mean.nii.gz"
 
-    when:
-      params.run_topup && params.run_eddy
+    //when:
+      // params.run_topup && params.run_eddy
 
     script:
     """

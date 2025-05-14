@@ -9,8 +9,8 @@ process PFT_Tracking {
     output:
     path("${sid}__pft_tracking_${params.pft_algo}_${params.pft_seeding_mask_type}_seed_${curr_seed}.trk")
 
-    when:
-        params.run_pft_tracking
+    //when:
+      //  params.run_pft_tracking
 
     script:
     compress =\

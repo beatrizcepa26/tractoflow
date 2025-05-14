@@ -9,8 +9,8 @@ process Mean_FRF {
     output:
     path("mean_frf.txt") // into mean_frf
 
-    when:
-    params.mean_frf && !params.set_frf
+    //when:
+    //params.mean_frf && !params.set_frf
 
     script:
     """

@@ -7,8 +7,8 @@ process Denoise_T1 {
     output:
     tuple val(sid), path("*__t1_denoised.nii.gz") // into t1_for_mix_n4
 
-    when:
-    params.run_t1_denoising
+    //when:
+    //params.run_t1_denoising
 
     script:
     """

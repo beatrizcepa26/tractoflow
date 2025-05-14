@@ -10,8 +10,8 @@ process Extract_SH_Fitting_Shell {
         path("*__bvec_sh_fitting") 
         //into dwi_and_grad_for_sh_fitting
 
-    when:
-    params.sh_fitting
+    //when:
+    //params.sh_fitting
 
     script:
     """

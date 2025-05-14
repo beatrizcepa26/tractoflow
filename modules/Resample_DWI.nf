@@ -7,8 +7,8 @@ process Resample_DWI {
     output:
     tuple val(sid), path("${sid}__dwi_resampled.nii.gz") //into dwi_resampled_for_mix
 
-    when:
-    params.run_resample_dwi
+    //when:
+    //params.run_resample_dwi
 
     script:
     """

@@ -610,8 +610,9 @@ workflow{
 
     topup_files_for_eddy_topup = Channel.empty()
 
-    (topup_files_for_eddy_topup,_,_) = Topup(rev_b0_with_readout_encoding_for_topup)
-
+    if(params.run_topup && params.run_eddy){
+        (topup_files_for_eddy_topup,_,_) = Topup(rev_b0_with_readout_encoding_for_topup)
+    }
 
     dwi_for_eddy_topup.set{complex_dwi_for_eddy_topup}
     dwi_for_eddy_topup.set{simple_dwi_for_eddy_topup}
@@ -638,8 +639,9 @@ workflow{
 
     concatenated_dwi_for_eddy = Channel.empty()
     
-    concatenated_dwi_for_eddy = Prepare_dwi_for_eddy(dwi_rev_gradient_for_prepare_dwi_for_eddy) 
-
+    if (params.run_topup && params.run_eddy){
+        concatenated_dwi_for_eddy = Prepare_dwi_for_eddy(dwi_rev_gradient_for_prepare_dwi_for_eddy) 
+    }
     // Extract subjects with reverse b0 images for Eddy
     expl1 = Channel.value(0)
 
@@ -662,8 +664,10 @@ workflow{
         .join(readout_encoding_for_eddy_topup)
         .set{dwi_gradients_mask_topup_files_for_eddy_topup}
 
+    if ((rev_b0_count > 0 || rev_dwi_count > 0) && params.run_topup && params.run_eddy){
+        (dwi_from_eddy_topup,gradients_from_eddy_topup,_) = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
+    }
 
-    (dwi_from_eddy_topup,gradients_from_eddy_topup,_) = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
 
     dwi_for_eddy
         .combine(gradients_for_eddy, by: [0,1])
@@ -673,7 +677,9 @@ workflow{
         .join(readout_encoding_for_eddy)
         .set{dwi_gradients_mask_topup_files_for_eddy}
 
-    (dwi_from_eddy, gradients_from_eddy) = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, rev_dwi_counter)
+    if ((rev_b0_count == 0 && rev_dwi_count == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
+        (dwi_from_eddy, gradients_from_eddy) = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, rev_dwi_counter)
+    }
 
     dwi_for_test_eddy_topup
         .map{it -> if(!params.run_eddy){it}}
@@ -718,8 +724,10 @@ workflow{
 
     (dwi_mask_for_normalize, mask_for_resample, _) = Crop_DWI(dwi_and_b0_mask_b0_for_crop)
 
-    t1_for_mix_n4 = Channel.empty()
-    t1_for_mix_n4 = Denoise_T1(t1_for_denoise)
+    if (params.run_t1_denoising){
+        t1_for_mix_n4 = Channel.empty()
+        t1_for_mix_n4 = Denoise_T1(t1_for_denoise)
+    }
 
     t1_for_test_denoise
         .map{it -> if(!params.run_t1_denoising){it}}
@@ -730,8 +738,10 @@ workflow{
     t1_for_resample = N4_T1(t1_for_n4)
     t1_for_resample.set{t1_for_test_resample}
 
-    t1_resampled_for_mix = Channel.empty()
-    t1_resampled_for_mix = Resample_T1(t1_for_resample) 
+    if (params.run_resample_t1){
+        t1_resampled_for_mix = Channel.empty()
+        t1_resampled_for_mix = Resample_T1(t1_for_resample)
+    }
 
     t1_for_test_resample
         .map{it -> if(!params.run_resample_t1){it}}
@@ -756,8 +766,10 @@ workflow{
         .join(mask_for_resample)
         .set{dwi_mask_for_resample}
 
-    dwi_resampled_for_mix = Channel.empty()
-    dwi_resampled_for_mix = Resample_DWI(dwi_mask_for_resample)
+    if (params.run_resample_dwi){
+        dwi_resampled_for_mix = Channel.empty()
+        dwi_resampled_for_mix = Resample_DWI(dwi_mask_for_resample)
+    }
 
     dwi_for_test_resample
         .map{it -> if(!params.run_resample_dwi){it}}
@@ -781,10 +793,14 @@ workflow{
         .join(gradients_for_sh_fitting_shell)
         .set{dwi_and_grad_for_extract_sh_fitting_shell}
 
-    dwi_and_grad_for_sh_fitting = Channel.empty()
-    dwi_and_grad_for_sh_fitting = Extract_SH_Fitting_Shell(dwi_and_grad_for_extract_sh_fitting_shell)
+    if (params.sh_fitting){
+        dwi_and_grad_for_sh_fitting = Channel.empty()
+        dwi_and_grad_for_sh_fitting = Extract_SH_Fitting_Shell(dwi_and_grad_for_extract_sh_fitting_shell)
 
-    SH_Fitting(dwi_and_grad_for_sh_fitting)
+        SH_Fitting(dwi_and_grad_for_sh_fitting)
+    }
+
+
 
     dwi_for_extract_dti_shell
         .join(gradients_for_dti_shell)
@@ -829,9 +845,12 @@ workflow{
     labels_for_segmentation = Channel.empty()
     labels_for_segmentation = Register_Freesurfer(labels_mat_for_reg)
 
-    (wm_mask_freesurfer,_,_) = Segment_Freesurfer(labels_for_segmentation)
+    if(params.run_tractoflow_abs){
+        (wm_mask_freesurfer,_,_) = Segment_Freesurfer(labels_for_segmentation)
+    }else{
+        (map_wm_gm_csf_for_pft_maps, wm_mask_for_pft_tracking,_,_) = Segment_Tissues(t1_for_seg)
+    }
 
-    (map_wm_gm_csf_for_pft_maps, wm_mask_for_pft_tracking,_,_) = Segment_Tissues(t1_for_seg)
 
     wm_mask_for_pft_tracking.set{wm_mask_fast}
 
@@ -854,8 +873,10 @@ workflow{
         .collect()
         .set{all_frf_for_mean_frf}
 
-    mean_frf = Channel.empty()
-    mean_frf = Mean_FRF(all_frf_for_mean_frf)
+    if (params.mean_frf && !params.set_frf){
+        mean_frf = Channel.empty()
+        mean_frf = Mean_FRF(all_frf_for_mean_frf)
+    }
 
     frf_for_fodf = unique_frf
 
@@ -876,43 +897,54 @@ workflow{
     def fodf_for_pft_tracking = fodfs_m.fodf_for_pft_tracking
     def fodf_for_local_tracking = fodfs_m.fodf_for_pft_tracking
 
-    (pft_maps_for_pft_tracking, interface_for_pft_seeding_mask) = PFT_Tracking_Maps(map_wm_gm_csf_for_pft_maps)
-
-    wm_mask_for_pft_tracking
+    if (params.run_pft_tracking){
+        (pft_maps_for_pft_tracking, interface_for_pft_seeding_mask) = PFT_Tracking_Maps(map_wm_gm_csf_for_pft_maps)
+        wm_mask_for_pft_tracking
         .join(fa_for_pft_tracking)
         .join(interface_for_pft_seeding_mask)
         .set{wm_fa_int_for_pft}
 
-    seeding_mask_for_pft = Channel.empty()
-    seeding_mask_for_pft = PFT_Seeding_Mask(wm_fa_int_for_pft)
+        seeding_mask_for_pft = Channel.empty()
+        seeding_mask_for_pft = PFT_Seeding_Mask(wm_fa_int_for_pft)
 
-    fodf_for_pft_tracking
+        fodf_for_pft_tracking
         .join(pft_maps_for_pft_tracking)
         .join(seeding_mask_for_pft)
         .set{fodf_maps_for_pft_tracking}
     
-    PFT_Tracking(fodf_maps_for_pft_tracking,pft_random_seed)
+        PFT_Tracking(fodf_maps_for_pft_tracking,pft_random_seed)
 
-    wm_mask_for_local_tracking_mask
+
+    }
+    
+    
+
+
+    if (params.run_local_tracking){
+
+        wm_mask_for_local_tracking_mask
         .join(fa_for_local_tracking_mask)
         .set{wm_fa_for_local_tracking_mask}
 
-    tracking_mask_for_local = Channel.empty()
-    tracking_mask_for_local = Local_Tracking_Mask(wm_fa_for_local_tracking_mask)
+        tracking_mask_for_local = Channel.empty()
+        tracking_mask_for_local = Local_Tracking_Mask(wm_fa_for_local_tracking_mask)
 
-    wm_mask_for_local_seeding_mask
+        wm_mask_for_local_seeding_mask
         .join(fa_for_local_seeding_mask)
         .set{wm_fa_for_local_seeding_mask}
 
-    tracking_seeding_mask_for_local = Channel.empty()
-    tracking_seeding_mask_for_local = Local_Seeding_Mask(wm_fa_for_local_seeding_mask)
+        tracking_seeding_mask_for_local = Channel.empty()
+        tracking_seeding_mask_for_local = Local_Seeding_Mask(wm_fa_for_local_seeding_mask)
 
-    fodf_for_local_tracking
+        fodf_for_local_tracking
         .join(tracking_mask_for_local)
         .join(tracking_seeding_mask_for_local)
         .set{fodf_maps_for_local_tracking}
     
     Local_Tracking(fodf_maps_for_local_tracking, local_random_seed)
+    }
+
+    
 }
 
 

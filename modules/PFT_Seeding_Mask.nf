@@ -7,8 +7,8 @@ process PFT_Seeding_Mask {
     output:
     tuple val(sid), path("${sid}__pft_seeding_mask.nii.gz") // into seeding_mask_for_pft
 
-    when:
-        params.run_pft_tracking
+    //when:
+      //  params.run_pft_tracking
 
     script:
     if (params.pft_seeding_mask_type == "wm")

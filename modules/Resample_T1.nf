@@ -7,8 +7,8 @@ process Resample_T1 {
     output:
     tuple val(sid), path("*__t1_resampled.nii.gz") // into t1_resampled_for_mix
 
-    when:
-    params.run_resample_t1
+    //when:
+    //params.run_resample_t1
 
     script:
     """

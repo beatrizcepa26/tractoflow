@@ -9,8 +9,8 @@ process Segment_Freesurfer {
     path("${sid}__mask_gm.nii.gz")
     path("${sid}__mask_csf.nii.gz")
 
-    when:
-        params.run_tractoflow_abs
+    //when:
+        //params.run_tractoflow_abs
 
     script:
     """

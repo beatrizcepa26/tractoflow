@@ -7,8 +7,8 @@ process Local_Seeding_Mask {
     output:
     tuple val(sid), path("${sid}__local_seeding_mask.nii.gz") // into tracking_seeding_mask_for_local
 
-    when:
-        params.run_local_tracking
+    //when:
+    //    params.run_local_tracking
 
     script:
     if (params.local_seeding_mask_type == "wm")

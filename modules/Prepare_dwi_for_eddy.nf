@@ -8,8 +8,8 @@ process Prepare_dwi_for_eddy {
   output:
     tuple val(sid), path("${sid}__concatenated_dwi.nii.gz"), path("${sid}__concatenated_dwi.bval"), path("${sid}__concatenated_dwi.bvec"), env(rev_number_dir) //into concatenated_dwi_for_eddy
 
-  when:
-    params.run_topup && params.run_eddy
+  // when:
+    //params.run_topup && params.run_eddy
 
   script:
   """

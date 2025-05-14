@@ -10,8 +10,8 @@ process Local_Tracking {
     output:
     path("${sid}__local_tracking_${params.local_algo}_${params.local_seeding_mask_type}_seeding_${params.local_tracking_mask_type}_mask_seed_${curr_seed}.trk")
 
-    when:
-        params.run_local_tracking
+    //when:
+    //    params.run_local_tracking
 
     script:
     compress =\

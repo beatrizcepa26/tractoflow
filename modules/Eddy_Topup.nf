@@ -13,8 +13,8 @@ process Eddy_Topup {
     tuple val(sid), path("${sid}__bval_eddy"), path("${sid}__dwi_eddy_corrected.bvec")  // into gradients_from_eddy_topup
     file "${sid}__b0_bet_mask.nii.gz"
 
-    when:
-    (rev_b0_count > 0 || rev_dwi_count > 0) && params.run_topup && params.run_eddy
+    //when:
+    //(rev_b0_count > 0 || rev_dwi_count > 0) && params.run_topup && params.run_eddy
 
     // Corrected DWI is clipped to ensure there are no negative values
     // introduced by Eddy.

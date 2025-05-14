@@ -7,8 +7,8 @@ process Local_Tracking_Mask {
     output:
     tuple val(sid), path("${sid}__local_tracking_mask.nii.gz") // into tracking_mask_for_local
 
-    when:
-        params.run_local_tracking
+    //when:
+    //    params.run_local_tracking
 
     script:
     if (params.local_tracking_mask_type == "wm")
