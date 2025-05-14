@@ -664,7 +664,7 @@ workflow{
         .join(readout_encoding_for_eddy_topup)
         .set{dwi_gradients_mask_topup_files_for_eddy_topup}
 
-    if ((rev_b0_count > 0 || rev_dwi_count > 0) && params.run_topup && params.run_eddy){
+    if ((rev_b0_counter > 0 || rev_dwi_counter > 0) && params.run_topup && params.run_eddy){
         (dwi_from_eddy_topup,gradients_from_eddy_topup,_) = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
     }
 
@@ -677,7 +677,7 @@ workflow{
         .join(readout_encoding_for_eddy)
         .set{dwi_gradients_mask_topup_files_for_eddy}
 
-    if ((rev_b0_count == 0 && rev_dwi_count == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
+    if ((rev_b0_counter == 0 && rev_dwi_counter == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
         (dwi_from_eddy, gradients_from_eddy) = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, rev_dwi_counter)
     }
 
