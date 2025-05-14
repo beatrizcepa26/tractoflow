@@ -511,10 +511,14 @@ workflow{
     dwi_denoised_for_mix = Channel.empty()
     dwi_gibbs_for_mix = Channel.empty()
 
+    
+    if (rev_b0_counter == 0 && rev_dwi_counter == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy){
+        (b0_mask_for_eddy,_,_) = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, rev_dwi_counter)
+    }
 
-    (b0_mask_for_eddy,_,_) = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, rev_dwi_counter)
-
-    dwi_denoised_for_mix = Denoise_DWI(dwi_for_denoise)
+    if (params.run_dwi_denoising){
+        dwi_denoised_for_mix = Denoise_DWI(dwi_for_denoise)
+    }
 
     dwi_for_test_denoise
         .map{it -> if(!params.run_dwi_denoising){it}}
@@ -522,8 +526,10 @@ workflow{
         .set{dwi_for_gibbs}
 
     
+    if (params.run_gibbs_correction){
+        dwi_gibbs_for_mix = Gibbs_correction(dwi_for_gibbs)
+    }
 
-    dwi_gibbs_for_mix = Gibbs_correction(dwi_for_gibbs)
     dwi_for_gibbs
         .map{it -> if(!params.run_gibbs_correction){it}}
         .mix(dwi_gibbs_for_mix)
@@ -581,7 +587,9 @@ workflow{
 
     simple_b0_for_topup = Channel.empty()
 
-    simple_b0_for_topup = Prepare_for_Topup(dwi_gradients_rev_b0_for_prepare_topup)
+    if (params.run_topup && params.run_eddy){
+        simple_b0_for_topup = Prepare_for_Topup(dwi_gradients_rev_b0_for_prepare_topup)
+    }
 
     simple_b0_for_topup
     .branch{

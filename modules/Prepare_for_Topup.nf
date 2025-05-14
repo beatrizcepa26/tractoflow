@@ -7,8 +7,8 @@ process Prepare_for_Topup {
   output:
     tuple val(sid), path("${sid}_${rev}b0_mean.nii.gz"), val(rev) //into simple_b0_for_topup
 
-  when:
-    params.run_topup && params.run_eddy
+  //when:
+  //  params.run_topup && params.run_eddy
 
   script:
   """

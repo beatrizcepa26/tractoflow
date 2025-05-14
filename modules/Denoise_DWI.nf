@@ -8,8 +8,8 @@ process Denoise_DWI {
     output:
     tuple val(sid), val(rev), path ("${sid}_${rev}dwi_denoised.nii.gz") // into dwi_denoised_for_mix
 
-    when:
-    params.run_dwi_denoising
+    //when:
+    // params.run_dwi_denoising
 
     script:
     // The denoised DWI is clipped to 0 since negative values

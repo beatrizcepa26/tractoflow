@@ -11,8 +11,8 @@ process Bet_Prelim_DWI {
     path "${sid}__b0_bet.nii.gz"
     path "${sid}__b0_bet_mask.nii.gz"
 
-    when:
-    (rev_b0_count == 0 && rev_dwi_count == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)
+    //when:
+    //(rev_b0_count == 0 && rev_dwi_count == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)
 
     script:
     """
