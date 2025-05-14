@@ -512,7 +512,7 @@ workflow{
     dwi_gibbs_for_mix = Channel.empty()
 
     
-    if (rev_b0_counter == 0 && rev_dwi_counter == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy){
+    if ((rev_b0_counter == 0 && rev_dwi_counter == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
         (b0_mask_for_eddy,_,_) = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, rev_dwi_counter)
     }
 
