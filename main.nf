@@ -855,6 +855,11 @@ if(params.help) {
     labels_for_segmentation = Channel.empty()
     labels_for_segmentation = Register_Freesurfer(labels_mat_for_reg)
 
+
+    wm_mask_freesurfer = Channel.empty()
+    map_wm_gm_csf_for_pft_maps = Channel.empty()
+    wm_mask_for_pft_tracking = Channel.empty()
+
     if(params.run_tractoflow_abs){
         (wm_mask_freesurfer,_,_) = Segment_Freesurfer(labels_for_segmentation)
     }else{
@@ -885,7 +890,6 @@ if(params.help) {
 
     mean_frf = Channel.empty()
     if (params.mean_frf && !params.set_frf){
-        
         mean_frf = Mean_FRF(all_frf_for_mean_frf)
     }
 
