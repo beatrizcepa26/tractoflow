@@ -40,7 +40,6 @@ include { Local_Tracking_Mask } from "./modules/Local_Tracking_Mask.nf"
 include { Local_Seeding_Mask } from "./modules/Local_Seeding_Mask.nf"
 include { Local_Tracking } from "./modules/Local_Tracking.nf"
 
-import groovy.json.*
 
 // ---------------- Workflows of processes -------------------
 
@@ -58,6 +57,12 @@ params.help = false
 params.dti_shells = false
 params.fodf_shells = false
 
+
+
+workflow{
+
+
+    
 if(params.help) {
     usage = file("$baseDir/USAGE")
 
@@ -153,10 +158,6 @@ if(params.help) {
     print template.toString()
     return
 }
-
-
-workflow{
-
 
 
     log.info "TractoFlow pipeline"
@@ -511,6 +512,8 @@ workflow{
     dwi_denoised_for_mix = Channel.empty()
     dwi_gibbs_for_mix = Channel.empty()
 
+
+    
     
     if ((rev_b0_counter == 0 && rev_dwi_counter == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
         (b0_mask_for_eddy,_,_) = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, rev_dwi_counter)
@@ -663,6 +666,8 @@ workflow{
         .join(topup_files_for_eddy_topup)
         .join(readout_encoding_for_eddy_topup)
         .set{dwi_gradients_mask_topup_files_for_eddy_topup}
+        
+    
 
     if ((rev_b0_counter > 0 || rev_dwi_counter > 0) && params.run_topup && params.run_eddy){
         (dwi_from_eddy_topup,gradients_from_eddy_topup,_) = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
@@ -677,6 +682,10 @@ workflow{
         .join(readout_encoding_for_eddy)
         .set{dwi_gradients_mask_topup_files_for_eddy}
 
+
+    dwi_from_eddy = Channel.empty()
+    gradients_from_eddy = Channel.empty()
+    
     if ((rev_b0_counter == 0 && rev_dwi_counter == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
         (dwi_from_eddy, gradients_from_eddy) = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, rev_dwi_counter)
     }
@@ -944,13 +953,13 @@ workflow{
     Local_Tracking(fodf_maps_for_local_tracking, local_random_seed)
     }
 
-    
-}
-
-
-
-workflow.onComplete {
+    workflow.onComplete {
         log.info "Pipeline completed at: $workflow.complete"
         log.info "Execution status: ${ workflow.success ? 'OK' : 'failed' }"
         log.info "Execution duration: $workflow.duration"
     }
+}
+
+
+
+
