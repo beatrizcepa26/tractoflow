@@ -516,7 +516,9 @@ if(params.help) {
     
     
     if ((rev_b0_counter == 0 && rev_dwi_counter == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
-        (b0_mask_for_eddy,_,_) = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, rev_dwi_counter)
+        bet_prelim_dwi_results = Channel.empty()
+        bet_prelim_dwi_results = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, rev_dwi_counter)
+        b0_mask_for_eddy  = bet_prelim_dwi_results.b0_mask_for_eddy
     }
 
     if (params.run_dwi_denoising){
@@ -610,11 +612,13 @@ if(params.help) {
     .join(readout_encoding_for_topup)
     .set{rev_b0_with_readout_encoding_for_topup}
 
-
+    topup_results = Channel.empty()
     topup_files_for_eddy_topup = Channel.empty()
 
     if(params.run_topup && params.run_eddy){
-        (topup_files_for_eddy_topup,_,_) = Topup(rev_b0_with_readout_encoding_for_topup)
+        
+        topup_results = Topup(rev_b0_with_readout_encoding_for_topup)
+        topup_files_for_eddy_topup = topup_results.topup_files_for_eddy_topup
     }
 
     dwi_for_eddy_topup.set{complex_dwi_for_eddy_topup}
@@ -668,9 +672,12 @@ if(params.help) {
         .set{dwi_gradients_mask_topup_files_for_eddy_topup}
         
     
-    // > -> != for syntax motives
+    // '>' sign was changed to '!=' for syntax motives
     if ((rev_b0_counter != 0 || rev_dwi_counter != 0) && params.run_topup && params.run_eddy){ 
-        (dwi_from_eddy_topup,gradients_from_eddy_topup,_) = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
+        eddy_topup_r = Channel.empty()
+        eddy_topup_r = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
+        dwi_from_eddy_topup = eddy_topup_r.dwi_from_eddy_topup
+        gradients_from_eddy_topup = eddy_topup_r.gradients_from_eddy_topup
     }
 
 
@@ -722,8 +729,10 @@ if(params.help) {
         .join(gradients_for_bet)
         .set{dwi_gradients_for_bet}
     
-
-    (b0_and_mask_for_crop, dwi_b0_b0_mask_for_n4, _) = Bet_DWI(dwi_gradients_for_bet)
+    bet_dwi_r = Channel.empty()
+    bet_dwi_r = Bet_DWI(dwi_gradients_for_bet)
+    b0_and_mask_for_crop = bet_dwi_r.b0_and_mask_for_crop
+    dwi_b0_b0_mask_for_n4 = bet_dwi_r.dwi_b0_b0_mask_for_n4
 
     dwi_for_crop = N4_DWI(dwi_b0_b0_mask_for_n4)
 
@@ -731,7 +740,10 @@ if(params.help) {
         .join(b0_and_mask_for_crop)
         .set{dwi_and_b0_mask_b0_for_crop}
 
-    (dwi_mask_for_normalize, mask_for_resample, _) = Crop_DWI(dwi_and_b0_mask_b0_for_crop)
+    crop_dwi_r = Channel.empty()
+    crop_dwi_r = Crop_DWI(dwi_and_b0_mask_b0_for_crop)
+    dwi_mask_for_normalize = crop_dwi_r.dwi_mask_for_normalize
+    mask_for_resample = crop_dwi_r.mask_for_resample
 
     t1_for_mix_n4 = Channel.empty()
     if (params.run_t1_denoising){
@@ -767,8 +779,9 @@ if(params.help) {
         .join(gradients_for_normalize)
         .set{dwi_mask_grad_for_normalize}
     
-    
-    (dwi_for_resample,_) = Normalize_DWI(dwi_mask_grad_for_normalize)
+    normalize_dwi_r = Channel.empty()
+    normalize_dwi_r = Normalize_DWI(dwi_mask_grad_for_normalize)
+    dwi_for_resample = normalize_dwi_r.dwi_for_resample
     dwi_for_resample.set{dwi_for_test_resample}
 
     dwi_for_resample
@@ -846,7 +859,10 @@ if(params.help) {
         .join(b0_for_reg)
         .set{t1_fa_b0_for_reg}
 
-   (t1_for_seg, t1_for_freesurfer_reg,_,_) = Register_T1(t1_fa_b0_for_reg)
+    register_t1_r = Channel.empty()
+    register_t1_r = Register_T1(t1_fa_b0_for_reg)
+    t1_for_seg = register_t1_r.t1_for_seg
+    t1_for_freesurfer_reg = register_t1_r.t1_for_freesurfer_reg
 
    labels_for_reg
         .join(t1_for_freesurfer_reg)
@@ -860,10 +876,16 @@ if(params.help) {
     map_wm_gm_csf_for_pft_maps = Channel.empty()
     wm_mask_for_pft_tracking = Channel.empty()
 
+    segmentation_r = Channel.empty()
+
     if(params.run_tractoflow_abs){
-        (wm_mask_freesurfer,_,_) = Segment_Freesurfer(labels_for_segmentation)
+        segmentation_r = Segment_Freesurfer(labels_for_segmentation)
+        wm_mask_freesurfer = segmentation_r.wm_mask_freesurfer
     }else{
-        (map_wm_gm_csf_for_pft_maps, wm_mask_for_pft_tracking,_,_) = Segment_Tissues(t1_for_seg)
+        segmentation_r = Segment_Tissues(t1_for_seg)
+        map_wm_gm_csf_for_pft_maps = segmentation_r.map_wm_gm_csf_for_pft_maps
+        wm_mask_for_pft_tracking = wm_mask_for_pft_tracking
+        wm_mask_for_pft_tracking.set{wm_mask_fast}
     }
 
 

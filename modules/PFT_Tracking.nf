@@ -2,7 +2,7 @@ process PFT_Tracking {
     cpus 2
 
     input:
-    tuple val(sid), path(fodf), path(include), path(exclude), path(seed)
+    tuple val(sid), path(fodf), path(incl), path(exclude), path(seed)   // include -> incl do to conflit
         //from fodf_maps_for_pft_tracking
     each curr_seed //from pft_random_seed
 
@@ -19,7 +19,7 @@ process PFT_Tracking {
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
-        scil_compute_pft.py $fodf $seed $include $exclude\
+        scil_compute_pft.py $fodf $seed $incl $exclude\
             tmp.trk\
             --algo $params.pft_algo --$params.pft_seeding $params.pft_nbr_seeds\
             --seed $curr_seed --step $params.pft_step --theta $params.pft_theta\

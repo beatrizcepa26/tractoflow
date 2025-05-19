@@ -6,7 +6,7 @@ process Topup {
 
     output:
       tuple val(sid), path("${sid}__corrected_b0s.nii.gz"), path("${params.prefix_topup}_fieldcoef.nii.gz"),
-      path("${params.prefix_topup}_movpar.txt") //into topup_files_for_eddy_topup
+      path("${params.prefix_topup}_movpar.txt"), emit : topup_files_for_eddy_topup
       file "${sid}__rev_b0_warped.nii.gz"
       file "${sid}__rev_b0_mean.nii.gz"
 

@@ -5,7 +5,7 @@ process Segment_Freesurfer {
     tuple val(sid), path(aparc), path(wmparc) //from labels_for_segmentation
 
     output:
-    tuple val(sid), path("${sid}__mask_wm.nii.gz") //into wm_mask_freesurfer
+    tuple val(sid), path("${sid}__mask_wm.nii.gz"), emit: wm_mask_freesurfer
     path("${sid}__mask_gm.nii.gz")
     path("${sid}__mask_csf.nii.gz")
 

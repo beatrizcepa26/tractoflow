@@ -7,7 +7,7 @@ process Bet_Prelim_DWI {
     val(rev_dwi_count) // from rev_dwi_counter
 
     output:
-    tuple val(sid), path ("${sid}__b0_bet_mask_dilated.nii.gz") // into b0_mask_for_eddy
+    tuple val(sid), path ("${sid}__b0_bet_mask_dilated.nii.gz"), emit : b0_mask_for_eddy
     path "${sid}__b0_bet.nii.gz"
     path "${sid}__b0_bet_mask.nii.gz"
 

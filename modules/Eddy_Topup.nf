@@ -9,8 +9,8 @@ process Eddy_Topup {
     val(rev_dwi_count) //from rev_dwi_counter
 
     output:
-    tuple val(sid), path("${sid}__dwi_corrected.nii.gz") //into dwi_from_eddy_topup
-    tuple val(sid), path("${sid}__bval_eddy"), path("${sid}__dwi_eddy_corrected.bvec")  // into gradients_from_eddy_topup
+    tuple val(sid), path("${sid}__dwi_corrected.nii.gz"), emit: dwi_from_eddy_topup
+    tuple val(sid), path("${sid}__bval_eddy"), path("${sid}__dwi_eddy_corrected.bvec"), emit: gradients_from_eddy_topup
     file "${sid}__b0_bet_mask.nii.gz"
 
     //when:

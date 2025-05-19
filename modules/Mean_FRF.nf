@@ -1,7 +1,7 @@
 process Mean_FRF {
     cpus 1
-    publishDir = params.Mean_FRF_Publish_Dir
-    tag = {"All_FRF"}
+    publishDir params.Mean_FRF_Publish_Dir
+    tag "All_FRF"
 
     input:
     path(all_frf) // from all_frf_for_mean_frf

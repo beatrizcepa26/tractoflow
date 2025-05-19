@@ -6,8 +6,8 @@ process Crop_DWI {
     tuple val(sid), path(dwi), path(b0), path(b0_mask) // from dwi_and_b0_mask_b0_for_crop
 
     output:
-    tuple val(sid), path("*__dwi_cropped.nii.gz"), path("*__b0_mask_cropped.nii.gz") //into dwi_mask_for_normalize
-    tuple val(sid), path("*__b0_mask_cropped.nii.gz") // into mask_for_resample
+    tuple val(sid), path("*__dwi_cropped.nii.gz"), path("*__b0_mask_cropped.nii.gz"), emit: dwi_mask_for_normalize
+    tuple val(sid), path("*__b0_mask_cropped.nii.gz"), emit: mask_for_resample
     path("*__b0_cropped.nii.gz")
 
     script:

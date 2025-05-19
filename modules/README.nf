@@ -1,16 +1,17 @@
 process README {
     cpus 1
-    publishDir = params.Readme_Publish_Dir
-    tag = "README"
+    publishDir params.Readme_Publish_Dir
+    tag "README"
 
     output:
     path("readme.txt")
 
     script:
-    String list_options = new String();
-    for (String item : params) {
+    def list_options = ""
+    params.each { item ->
         list_options += item + "\n"
     }
+    
     """
     echo "TractoFlow pipeline\n" >> readme.txt
     echo "Start time: $workflow.start\n" >> readme.txt
