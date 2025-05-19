@@ -772,7 +772,7 @@ t1_for_test_resample
 t1_and_mask_for_crop = Channel.empty()
 t1_and_mask_for_crop = Bet_T1(t1_for_bet)
 
-t1_and_mask_for_crop = Channel.empty()
+t1_and_mask_for_reg = Channel.empty()
 t1_and_mask_for_reg = Crop_T1(t1_and_mask_for_crop)
 
 dwi_mask_for_normalize
@@ -884,7 +884,7 @@ if(params.run_tractoflow_abs){
 }else{
     segmentation_r = Segment_Tissues(t1_for_seg)
     map_wm_gm_csf_for_pft_maps = segmentation_r.map_wm_gm_csf_for_pft_maps
-    wm_mask_for_pft_tracking = wm_mask_for_pft_tracking
+    wm_mask_for_pft_tracking = segmentation_r.wm_mask_for_pft_tracking
     wm_mask_for_pft_tracking.set{wm_mask_fast}
 }
 
