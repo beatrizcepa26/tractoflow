@@ -1,6 +1,6 @@
 process README {
     cpus 1
-    publishDir 'params.Readme_Publish_Dir'
+    publishDir params.Readme_Publish_Dir
     tag "README"
 
     output:
