@@ -1,17 +1,19 @@
 process README {
     cpus 1
-    publishDir params.Readme_Publish_Dir
+    publishDir 'params.Readme_Publish_Dir'
     tag "README"
 
     output:
     path("readme.txt")
 
     script:
-    def list_options = ""
-    params.each { item ->
-        list_options += item + "\n"
+
+    def list_options = "";
+    params.each { key, value ->
+        list_options +="$key: $value\n"
     }
-    
+
+
     """
     echo "TractoFlow pipeline\n" >> readme.txt
     echo "Start time: $workflow.start\n" >> readme.txt
