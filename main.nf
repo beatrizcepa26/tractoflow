@@ -1,5 +1,7 @@
 #!/usr/bin/env nextflow
 
+nextflow.enable.dsl=2
+
 include {README} from "./modules/README.nf"
 include {Read_BIDS} from "./modules/Read_BIDS.nf"
 include {Bet_Prelim_DWI} from "./modules/Bet_Prelim_DWI.nf"
