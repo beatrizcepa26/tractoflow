@@ -417,16 +417,16 @@ all_info_ch = in_data
 
 t1_for_denoise = all_info_ch.map{it[2]}.unique()
 t1_for_test_denoise = all_info_ch.map{it[2]}.unique()
-rev_b0_counter = Channel.value(check_complex_rev_b0.concat(check_simple_rev_b0).count())
-number_rev_b0_for_compare = Channel.value(check_complex_rev_b0.concat(check_simple_rev_b0).count())
-number_subj_for_null_check = Channel.value(unique_subjects_number.count())
-number_subj_for_compare = Channel.value(unique_subjects_number.count())
+rev_b0_counter = Channel.of(check_complex_rev_b0.concat(check_simple_rev_b0).count())
+number_rev_b0_for_compare = Channel.of(check_complex_rev_b0.concat(check_simple_rev_b0).count())
+number_subj_for_null_check = Channel.of(unique_subjects_number.count())
+number_subj_for_compare = Channel.of(unique_subjects_number.count())
 
 
 
 
-number_rev_dwi = Channel.value(check_rev_number.count())
-rev_dwi_counter = Channel.value(check_rev_number.count())
+number_rev_dwi = Channel.of(check_rev_number.count())
+rev_dwi_counter = Channel.of(check_rev_number.count())
 
 if (params.eddy_cmd == "eddy_cpu" && params.processes_eddy == 1 && params.run_eddy == true){
 number_rev_dwi
