@@ -401,12 +401,6 @@ if (params.bids && workflow.profile.contains("ABS") && !params.fs){
 
 t1_for_denoise = Channel.empty()
 t1_for_test_denoise = Channel.empty()
-rev_b0_counter = Channel.empty()
-number_rev_b0_for_compare = Channel.empty()
-number_subj_for_null_check = Channel.empty()
-number_subj_for_compare = Channel.empty()
-number_rev_dwi = Channel.empty()
-rev_dwi_counter = Channel.empty()
 truc = Channel.empty()
 
 
@@ -423,16 +417,16 @@ all_info_ch = in_data
 
 t1_for_denoise = all_info_ch.map{it[2]}.unique()
 t1_for_test_denoise = all_info_ch.map{it[2]}.unique()
-rev_b0_counter = check_complex_rev_b0.concat(check_simple_rev_b0).count()
-number_rev_b0_for_compare = check_complex_rev_b0.concat(check_simple_rev_b0).count()
-number_subj_for_null_check = unique_subjects_number.count()
-number_subj_for_compare = unique_subjects_number.count()
+rev_b0_counter = Channel.value(check_complex_rev_b0.concat(check_simple_rev_b0).count())
+number_rev_b0_for_compare = Channel.value(check_complex_rev_b0.concat(check_simple_rev_b0).count())
+number_subj_for_null_check = Channel.value(unique_subjects_number.count())
+number_subj_for_compare = Channel.value(unique_subjects_number.count())
 
 
 
 
-number_rev_dwi = check_rev_number.count()
-rev_dwi_counter = check_rev_number.count()
+number_rev_dwi = Channel.value(check_rev_number.count())
+rev_dwi_counter = Channel.value(check_rev_number.count())
 
 if (params.eddy_cmd == "eddy_cpu" && params.processes_eddy == 1 && params.run_eddy == true){
 number_rev_dwi
@@ -499,7 +493,7 @@ readout_encoding_for_topup = all_info_ch.map{it[3]}
 readout_encoding_for_eddy = all_info_ch.map{it[3]}
 readout_encoding_for_eddy_topup = all_info_ch.map{it[3]}
 
-ch_sid_dwi_for_rev = ch_sid_dwi
+
 ch_sid_dwi_for_dwi = ch_sid_dwi
 
 
@@ -674,8 +668,11 @@ concatenated_dwi_for_eddy
     .set{dwi_gradients_mask_topup_files_for_eddy_topup}
     
 
-// '>' sign was changed to '!=' for syntax motives
-if ((rev_b0_counter != 0 || rev_dwi_counter != 0) && params.run_topup && params.run_eddy){ 
+dwi_from_eddy_topup = Channel.empty()
+gradients_from_eddy_topup = Channel.empty()
+
+
+if ((rev_b0_counter > 0 || rev_dwi_counter > 0) && params.run_topup && params.run_eddy){ 
     eddy_topup_r = Channel.empty()
     eddy_topup_r = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
     dwi_from_eddy_topup = eddy_topup_r.dwi_from_eddy_topup
