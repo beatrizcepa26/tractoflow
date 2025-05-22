@@ -670,13 +670,20 @@ concatenated_dwi_for_eddy
 
 dwi_from_eddy_topup = Channel.empty()
 gradients_from_eddy_topup = Channel.empty()
+eddy_topup_r = Channel.empty()
 
 
-if ((rev_b0_counter > 0 || rev_dwi_counter > 0) && params.run_topup && params.run_eddy){ 
-    eddy_topup_r = Channel.empty()
-    eddy_topup_r = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
-    dwi_from_eddy_topup = eddy_topup_r.dwi_from_eddy_topup
-    gradients_from_eddy_topup = eddy_topup_r.gradients_from_eddy_topup
+rev_b0_counter
+    .combine(rev_dwi_counter)
+    .map { b0, dwi -> ((b0 > 0 || dwi > 0) && params.run_topup && params.run_eddy)}
+    .filter{it}
+    .set{eddy_t_trigger}
+
+// This condition and the Eddy process condition were moved to Channel logic to assure all variables are available at runtime 
+if (eddy_t_trigger == true ){ 
+        eddy_topup_r = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
+        dwi_from_eddy_topup = eddy_topup_r.dwi_from_eddy_topup
+        gradients_from_eddy_topup = eddy_topup_r.gradients_from_eddy_topup
 }
 
 
@@ -692,7 +699,13 @@ dwi_for_eddy
 dwi_from_eddy = Channel.empty()
 gradients_from_eddy = Channel.empty()
 
-if ((rev_b0_counter == 0 && rev_dwi_counter == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
+rev_b0_counter
+    .combine(rev_dwi_counter)
+    .map { b0, dwi -> (b0 == 0 && dwi == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)}
+    .filter{it}
+    .set{eddy_trigger}
+
+if (eddy_trigger == true){
     (dwi_from_eddy, gradients_from_eddy) = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, rev_dwi_counter)
 }
 
