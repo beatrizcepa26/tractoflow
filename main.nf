@@ -680,7 +680,7 @@ rev_b0_counter
     .set{eddy_t_trigger}
 
 // This condition and the Eddy process condition were moved to Channel logic to assure all variables are available at runtime 
-if (eddy_t_trigger == true ){ 
+if (eddy_t_trigger){ 
         eddy_topup_r = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
         dwi_from_eddy_topup = eddy_topup_r.dwi_from_eddy_topup
         gradients_from_eddy_topup = eddy_topup_r.gradients_from_eddy_topup
@@ -705,7 +705,8 @@ rev_b0_counter
     .filter{it}
     .set{eddy_trigger}
 
-if (eddy_trigger == true){
+
+if (eddy_trigger){
     (dwi_from_eddy, gradients_from_eddy) = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, rev_dwi_counter)
 }
 
