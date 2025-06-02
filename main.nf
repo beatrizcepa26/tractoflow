@@ -1,5 +1,3 @@
-
-
 nextflow.enable.dsl=2
 
 include {README} from "./modules/README.nf"
@@ -188,7 +186,6 @@ labels_for_reg = Channel.empty()
 freesurfer_path = Channel.from("")
 bidsignore_path = Channel.from("")
 rev_b0_for_topup = Channel.empty()
-check_simple_rev_b0 = Channel.empty()
 
 
 if (params.input && !(params.bids && params.bids_config)) {
@@ -232,12 +229,8 @@ if (params.input && !(params.bids && params.bids_config)) {
         .fromPath("$root/**/*rev_b0.nii.gz", maxDepth: 1)
         .map { tuple(it.parent.name, it) }
 
-    check_simple_rev_b0 = rev_b0_for_topup.map { it[0] }
     sid_rev_b0_included = rev_b0_for_topup.map { it[0] }
-    sid_rev_b0_included_for_eddy_topup = rev_b0_for_topup.map { it[0] }
-    sid_rev_b0_for_prepare_topup_dwi = rev_b0_for_topup.map { it[0] }
 
-    
 
     Channel.empty().set { sid_rev_dwi_included }
     Channel.empty().set { sid_rev_dwi_included_for_eddy }
@@ -344,12 +337,12 @@ if (params.input && !(params.bids && params.bids_config)) {
     }
 
 
-    Channel.empty().into{sid_rev_dwi_included; sid_rev_b0_for_prepare_topup_dwi; sid_rev_dwi_included_for_topup; check_rev_number}
+    Channel.empty().into{sid_rev_dwi_included; sid_rev_dwi_included_for_topup; check_rev_number}
     ch_sid_rev_dwi.into{sid_rev_dwi_included; sid_rev_dwi_included_for_topup; sid_rev_dwi_for_prepare_topup_for_dwi; sid_rev_dwi_included_for_eddy; check_rev_number}
-    ch_sid_rev_b0.into{sid_rev_b0_included; sid_rev_dwi_for_topup; sid_rev_b0_included_for_eddy_topup; sid_rev_b0_for_prepare_topup_dwi}
+    ch_sid_rev_b0.into{sid_rev_b0_included; sid_rev_dwi_for_topup}
     ch_in_data.into{in_data; check_subjects_number}
 
-    ch_simple_rev_b0.into{rev_b0_for_topup; check_simple_rev_b0}
+    ch_simple_rev_b0.into{rev_b0_for_topup; sid_rev_b0_included}
     ch_complex_rev_b0.into{complex_rev_b0_for_topup; check_complex_rev_b0}
 
 }
@@ -399,10 +392,6 @@ if (params.bids && workflow.profile.contains("ABS") && !params.fs){
 }
 
 
-t1_for_denoise = Channel.empty()
-t1_for_test_denoise = Channel.empty()
-truc = Channel.empty()
-
 
 all_info_ch = in_data
         .map { sid, rev_flag, bvals, bvecs, dwi_v, t1_v, readout, encoding ->
@@ -416,17 +405,12 @@ all_info_ch = in_data
 
 
 t1_for_denoise = all_info_ch.map{it[2]}.unique()
-t1_for_test_denoise = all_info_ch.map{it[2]}.unique()
-rev_b0_counter = check_complex_rev_b0.concat(check_simple_rev_b0).count()
-number_rev_b0_for_compare = check_complex_rev_b0.concat(check_simple_rev_b0).count()
-number_subj_for_null_check = unique_subjects_number.count()
-number_subj_for_compare = unique_subjects_number.count()
-
-
+rev_b0_counter = check_complex_rev_b0.concat(sid_rev_b0_included).count()
+number_subj = unique_subjects_number.count()
 
 
 number_rev_dwi = check_rev_number.count()
-rev_dwi_counter = check_rev_number.count()
+
 
 if (params.eddy_cmd == "eddy_cpu" && params.processes_eddy == 1 && params.run_eddy == true){
 number_rev_dwi
@@ -443,7 +427,7 @@ number_rev_dwi
     error "Error ~ You have some subjects with a reverse encoding DWI. You MUST run topup and eddy with this kind of acquisition."}
 }
 
-number_subj_for_null_check
+number_subj
 .subscribe{a -> if (a == 0)
     error "Error ~ No subjects found. Please check the naming convention, your --input path or your BIDS folder."}
 
@@ -452,18 +436,16 @@ if (params.set_frf && params.mean_frf){
 }
 
 if (params.run_topup){
-number_subj_for_compare
-    .concat(number_rev_b0_for_compare)
+number_subj
+    .concat(rev_b0_counter)
     .toList()
     .subscribe{a, b -> if (a != b && b > 0)
     error "Error ~ Some subjects have a reversed phase encoded b=0 and others don't.\n" +
         "Please be sure to have the same acquisitions for all subjects."}
 }
 
-dwi_for_prelim_bet = all_info_ch.map{it[0]}
-dwi_for_denoise = all_info_ch.map{it[0]}
-dwi_for_test_denoise = all_info_ch.map{it[0]}
-truc = all_info_ch.map{it[0]}
+dwi_ = all_info_ch.map{it[0]}
+
 pft_random_seed = Channel.empty()
 local_random_seed = Channel.empty()
 
@@ -482,46 +464,33 @@ else{
     local_random_seed = params.local_random_seed
 }
 
-gradients_for_prelim_bet = all_info_ch.map{it[1]}
-gradients_for_eddy = all_info_ch.map{it[1]}
-gradients_for_prepare_topup = all_info_ch.map{it[1]}
-gradients_for_prepare_dwi_for_eddy = all_info_ch.map{it[1]}
-gradients_for_eddy_topup = all_info_ch.map{it[1]} 
-gradients_for_test_eddy_topup = all_info_ch.map{it[1]}
+gradients_ = all_info_ch.map{it[1]}
 
-readout_encoding_for_topup = all_info_ch.map{it[3]}
-readout_encoding_for_eddy = all_info_ch.map{it[3]}
-readout_encoding_for_eddy_topup = all_info_ch.map{it[3]}
-
-
-ch_sid_dwi_for_dwi = ch_sid_dwi
-
+readout_encoding_ = all_info_ch.map{it[3]}
 
 README()
 
 
-dwi_for_prelim_bet
-    .combine(gradients_for_prelim_bet, by: [0,1])
+dwi_
+    .combine(gradients_, by: [0,1])
     .set{dwi_gradient_for_prelim_bet}
 
-b0_mask_for_eddy = Channel.empty()
 dwi_denoised_for_mix = Channel.empty()
 dwi_gibbs_for_mix = Channel.empty()
 
 
 
 
-if ((rev_b0_counter == 0 && rev_dwi_counter == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
+if ((rev_b0_counter == 0 && number_rev_dwi == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
     bet_prelim_dwi_results = Channel.empty()
-    bet_prelim_dwi_results = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, rev_dwi_counter)
-    b0_mask_for_eddy  = bet_prelim_dwi_results.b0_mask_for_eddy
+    bet_prelim_dwi_results = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, number_rev_dwi)
 }
 
 if (params.run_dwi_denoising){
-    dwi_denoised_for_mix = Denoise_DWI(dwi_for_denoise)
+    dwi_denoised_for_mix = Denoise_DWI(dwi_)
 }
 
-dwi_for_test_denoise
+dwi_
     .map{it -> if(!params.run_dwi_denoising){it}}
     .mix(dwi_denoised_for_mix)
     .set{dwi_for_gibbs}
@@ -534,18 +503,11 @@ if (params.run_gibbs_correction){
 dwi_for_gibbs
     .map{it -> if(!params.run_gibbs_correction){it}}
     .mix(dwi_gibbs_for_mix)
-    .set{dwi_for_eddy}
-
-
-dwi_for_eddy.set{dwi_for_topup}
-dwi_for_eddy.set{dwi_for_eddy_topup}
-dwi_for_eddy.set{dwi_for_test_eddy_topup}
-
-
+    .set{dwi_for_eddy} // will be used as well for topup processes
 
 
 ch_sid_b0
-.mix(ch_sid_dwi_for_dwi)
+.mix(ch_sid_dwi)
 .collect()
 .map { it
         // Group by sid
@@ -557,7 +519,7 @@ ch_sid_b0
 }
 .flatMap()
 .map {[it[0]]}
-.join(sid_rev_b0_for_prepare_topup_dwi.concat(sid_rev_dwi_for_prepare_topup_for_dwi))
+.join(sid_rev_b0_included.concat(sid_rev_dwi_for_prepare_topup_for_dwi))
 .map {[it, "_"]}
 .set{sid_dwi_for_prepare_topup}
 
@@ -580,9 +542,9 @@ sid_rev_b0_included
 .map{[it, "_rev_"]}
 .set{sid_rev_dwi_for_prepare_topup}
 
-dwi_for_topup
+dwi_for_eddy
 .combine(sid_dwi_for_prepare_topup.concat(sid_rev_dwi_for_prepare_topup), by: [0,1])
-.join(gradients_for_prepare_topup)
+.join(gradients_)
 .map{ [it[0], it[1], it[2], it[4], it[5]] }
 .set{dwi_gradients_rev_b0_for_prepare_topup}
 
@@ -605,24 +567,21 @@ branch_b0_for_topup.reverse_b0
 .mix(rev_b0_for_topup)
 .join(branch_b0_for_topup.forward_b0)
 .mix(complex_rev_b0_for_topup)
-.join(readout_encoding_for_topup)
+.join(readout_encoding_)
 .set{rev_b0_with_readout_encoding_for_topup}
 
 topup_results = Channel.empty()
 topup_files_for_eddy_topup = Channel.empty()
 
 if(params.run_topup && params.run_eddy){
-    
     topup_results = Topup(rev_b0_with_readout_encoding_for_topup)
-    topup_files_for_eddy_topup = topup_results.topup_files_for_eddy_topup
+    topup_files_for_eddy_topup = topup_results.topup_files_for_eddy_topup   // Here we use a channel so the variable 'exists' even if the process doens't
 }
 
-dwi_for_eddy_topup.set{complex_dwi_for_eddy_topup}
-dwi_for_eddy_topup.set{simple_dwi_for_eddy_topup}
 
 // Extract subjects with reverse DWI for Prepare_dwi_for_eddy
-complex_dwi_for_eddy_topup
-    .join(gradients_for_prepare_dwi_for_eddy)
+dwi_for_eddy
+    .join(gradients_)
     .map{[it[0], it[1], it[2], it[4], it[5]]}
     .set{dwi_gradient_for_prepare_dwi_for_eddy}
 
@@ -648,12 +607,12 @@ if (params.run_topup && params.run_eddy){
 // Extract subjects with reverse b0 images for Eddy
 expl1 = Channel.value(0)
 
-gradients_for_eddy_topup
+gradients_
     .filter{ it[1] == "_" }
     .set{simple_gradients_for_eddy_topup}
 
-sid_rev_b0_included_for_eddy_topup
-    .combine(simple_dwi_for_eddy_topup, by: 0)
+sid_rev_b0_included
+    .combine(dwi_for_eddy, by: 0)
     .filter{ it[1] == "_" }
     .join(simple_gradients_for_eddy_topup)
     .merge(expl1)
@@ -664,7 +623,7 @@ concatenated_dwi_for_eddy
     .mix(simple_dwi_gradients_for_eddy_topup)
     .map{ [it[0], it[1], it[2], it[3], it[4]] }
     .join(topup_files_for_eddy_topup)
-    .join(readout_encoding_for_eddy_topup)
+    .join(readout_encoding_)
     .set{dwi_gradients_mask_topup_files_for_eddy_topup}
     
 
@@ -674,25 +633,25 @@ eddy_topup_r = Channel.empty()
 
 
 rev_b0_counter
-    .combine(rev_dwi_counter)
+    .combine(number_rev_dwi)
     .map { b0, dwi -> ((b0 > 0 || dwi > 0) && params.run_topup && params.run_eddy)}
     .filter{it}
     .set{eddy_t_trigger}
 
 // This condition and the Eddy process condition were moved to Channel logic to assure all variables are available at runtime 
 if (eddy_t_trigger){ 
-        eddy_topup_r = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, rev_dwi_counter)
+        eddy_topup_r = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, number_rev_dwi)
         dwi_from_eddy_topup = eddy_topup_r.dwi_from_eddy_topup
-        gradients_from_eddy_topup = eddy_topup_r.gradients_from_eddy_topup
+        gradients_from_eddy_topup = eddy_topup_r.gradients_from_eddy_topup  
 }
 
 
 dwi_for_eddy
-    .combine(gradients_for_eddy, by: [0,1])
+    .combine(gradients_, by: [0,1])
     .filter{ it[1] == "_" }
     .map{ [it[0], it[2], it[3], it[4]] }
-    .join(b0_mask_for_eddy)
-    .join(readout_encoding_for_eddy)
+    .join(bet_prelim_dwi_results.b0_mask_for_eddy)
+    .join(readout_encoding_)
     .set{dwi_gradients_mask_topup_files_for_eddy}
 
 
@@ -700,23 +659,23 @@ dwi_from_eddy = Channel.empty()
 gradients_from_eddy = Channel.empty()
 
 rev_b0_counter
-    .combine(rev_dwi_counter)
+    .combine(number_rev_dwi)
     .map { b0, dwi -> (b0 == 0 && dwi == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)}
     .filter{it}
     .set{eddy_trigger}
 
 
 if (eddy_trigger){
-    (dwi_from_eddy, gradients_from_eddy) = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, rev_dwi_counter)
+    (dwi_from_eddy, gradients_from_eddy) = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, number_rev_dwi)
 }
 
-dwi_for_test_eddy_topup
+dwi_for_eddy
     .map{it -> if(!params.run_eddy){it}}
     .filter{ it[1] == "_" }
     .map{ [it[0], it[2]] }
     .set{dwi_for_skip_eddy_topup}
 
-gradients_for_test_eddy_topup
+gradients_
     .map{it -> if(!params.run_eddy){it}}
     .filter{ it[1] == "_" }
     .map{ [it[0], it[2], it[3]] }
@@ -730,54 +689,44 @@ dwi_from_eddy
 gradients_from_eddy
     .mix(gradients_from_eddy_topup)
     .mix(gradients_for_skip_eddy_topup)
-    .set{gradients_for_extract_b0}
-
-gradients_for_extract_b0.set{gradients_for_dti_shell}
-gradients_for_extract_b0.set{gradients_for_fodf_shell}
-gradients_for_extract_b0.set{gradients_for_normalize}
-gradients_for_extract_b0.set{gradients_for_bet}
-gradients_for_extract_b0.set{gradients_for_sh_fitting_shell}
+    .set{gradients_for_all}
 
 dwi_for_bet
-    .join(gradients_for_bet)
+    .join(gradients_for_all)
     .set{dwi_gradients_for_bet}
 
 bet_dwi_r = Channel.empty()
 bet_dwi_r = Bet_DWI(dwi_gradients_for_bet)
-b0_and_mask_for_crop = bet_dwi_r.b0_and_mask_for_crop
-dwi_b0_b0_mask_for_n4 = bet_dwi_r.dwi_b0_b0_mask_for_n4
 
-dwi_for_crop = N4_DWI(dwi_b0_b0_mask_for_n4)
+
+dwi_for_crop = N4_DWI(bet_dwi_r.dwi_b0_b0_mask_for_n4)
 
 dwi_for_crop
-    .join(b0_and_mask_for_crop)
+    .join(bet_dwi_r.b0_and_mask_for_crop)
     .set{dwi_and_b0_mask_b0_for_crop}
 
 crop_dwi_r = Channel.empty()
 crop_dwi_r = Crop_DWI(dwi_and_b0_mask_b0_for_crop)
-dwi_mask_for_normalize = crop_dwi_r.dwi_mask_for_normalize
-mask_for_resample = crop_dwi_r.mask_for_resample
 
 t1_for_mix_n4 = Channel.empty()
 if (params.run_t1_denoising){
     t1_for_mix_n4 = Denoise_T1(t1_for_denoise)
 }
 
-t1_for_test_denoise
+t1_for_denoise
     .map{it -> if(!params.run_t1_denoising){it}}
     .mix(t1_for_mix_n4)
     .set{t1_for_n4}
 
 t1_for_resample = Channel.empty()
 t1_for_resample = N4_T1(t1_for_n4)
-t1_for_resample.set{t1_for_test_resample}
 
 t1_resampled_for_mix = Channel.empty()
 if (params.run_resample_t1){
     t1_resampled_for_mix = Resample_T1(t1_for_resample)
 }
 
-t1_for_test_resample
+t1_for_resample
     .map{it -> if(!params.run_resample_t1){it}}
     .mix(t1_resampled_for_mix)
     .set{t1_for_bet}
@@ -788,17 +737,16 @@ t1_and_mask_for_crop = Bet_T1(t1_for_bet)
 t1_and_mask_for_reg = Channel.empty()
 t1_and_mask_for_reg = Crop_T1(t1_and_mask_for_crop)
 
-dwi_mask_for_normalize
-    .join(gradients_for_normalize)
+crop_dwi_r.dwi_mask_for_normalize
+    .join(gradients_for_all)
     .set{dwi_mask_grad_for_normalize}
 
 normalize_dwi_r = Channel.empty()
 normalize_dwi_r = Normalize_DWI(dwi_mask_grad_for_normalize)
-dwi_for_resample = normalize_dwi_r.dwi_for_resample
-dwi_for_resample.set{dwi_for_test_resample}
 
-dwi_for_resample
-    .join(mask_for_resample)
+
+normalize_dwi_r.dwi_for_resample
+    .join(crop_dwi_r.mask_for_resample)
     .set{dwi_mask_for_resample}
 
 dwi_resampled_for_mix = Channel.empty()
@@ -806,56 +754,47 @@ if (params.run_resample_dwi){
     dwi_resampled_for_mix = Resample_DWI(dwi_mask_for_resample)
 }
 
-dwi_for_test_resample
+normalize_dwi_r.dwi_for_resample
     .map{it -> if(!params.run_resample_dwi){it}}
     .mix(dwi_resampled_for_mix)
-    .set{dwi_for_extract_b0}
+    .set{dwi_for_extractions}
 
-dwi_for_extract_b0.set{dwi_for_extract_dti_shell}
-dwi_for_extract_b0.set{dwi_for_extract_fodf_shell}
-dwi_for_extract_b0.set{dwi_for_extract_sh_fitting_shell}
 
-dwi_for_extract_b0
-    .join(gradients_for_extract_b0)
+dwi_for_extractions
+    .join(gradients_for_all)
     .set{dwi_and_grad_for_extract_b0}
 
-(b0_for_reg, b0_mask_for_dti_metrics) = Extract_B0(dwi_and_grad_for_extract_b0)
+(b0_for_reg, b0_mask) = Extract_B0(dwi_and_grad_for_extract_b0)
 
-b0_mask_for_dti_metrics.set{b0_mask_for_fodf}
-b0_mask_for_dti_metrics.set{b0_mask_for_rf}
 
-dwi_for_extract_sh_fitting_shell
-    .join(gradients_for_sh_fitting_shell)
+dwi_for_extractions
+    .join(gradients_for_all)
     .set{dwi_and_grad_for_extract_sh_fitting_shell}
 
 dwi_and_grad_for_sh_fitting = Channel.empty()
-if (params.sh_fitting){
-    
-    dwi_and_grad_for_sh_fitting = Extract_SH_Fitting_Shell(dwi_and_grad_for_extract_sh_fitting_shell)
 
+if (params.sh_fitting){
+    dwi_and_grad_for_sh_fitting = Extract_SH_Fitting_Shell(dwi_and_grad_for_extract_sh_fitting_shell)
     SH_Fitting(dwi_and_grad_for_sh_fitting)
 }
 
-
-
-dwi_for_extract_dti_shell
-    .join(gradients_for_dti_shell)
+dwi_for_extractions
+    .join(gradients_for_all)
     .set{dwi_and_grad_for_extract_dti_shell}
 
 dwi_and_grad_for_dti_metrics =  Channel.empty()
 dwi_and_grad_for_dti_metrics = Extract_DTI_Shell(dwi_and_grad_for_extract_dti_shell)
-dwi_and_grad_for_dti_metrics.set{dwi_and_grad_for_rf}
 
 dwi_and_grad_for_dti_metrics
-    .join(b0_mask_for_dti_metrics)
+    .join(b0_mask)
     .set{dwi_and_grad_for_dti_metrics}
 
 
 dti_metrics_results = Channel.empty()
 dti_metrics_results = DTI_Metrics(dwi_and_grad_for_dti_metrics)
 
-dwi_for_extract_fodf_shell
-    .join(gradients_for_fodf_shell)
+dwi_for_extractions
+    .join(gradients_for_all)
     .set{dwi_and_grad_for_extract_fodf_shell}
 
 
@@ -869,11 +808,10 @@ t1_and_mask_for_reg
 
 register_t1_r = Channel.empty()
 register_t1_r = Register_T1(t1_fa_b0_for_reg)
-t1_for_seg = register_t1_r.t1_for_seg
-t1_for_freesurfer_reg = register_t1_r.t1_for_freesurfer_reg
+
 
 labels_for_reg
-    .join(t1_for_freesurfer_reg)
+    .join(register_t1_r.t1_for_freesurfer_reg)
     .set{labels_mat_for_reg}
 
 labels_for_segmentation = Channel.empty()
@@ -890,24 +828,19 @@ if(params.run_tractoflow_abs){
     segmentation_r = Segment_Freesurfer(labels_for_segmentation)
     wm_mask_freesurfer = segmentation_r.wm_mask_freesurfer
 }else{
-    segmentation_r = Segment_Tissues(t1_for_seg)
+    segmentation_r = Segment_Tissues(register_t1_r.t1_for_seg)
     map_wm_gm_csf_for_pft_maps = segmentation_r.map_wm_gm_csf_for_pft_maps
     wm_mask_for_pft_tracking = segmentation_r.wm_mask_for_pft_tracking
-    wm_mask_for_pft_tracking.set{wm_mask_fast}
 }
 
 
-wm_mask_for_pft_tracking.set{wm_mask_fast}
-
 
 wm_mask_freesurfer
-    .concat(wm_mask_fast)
+    .concat(wm_mask_for_pft_tracking)
     .set{wm_mask_for_local_tracking_mask}
 
-wm_mask_for_local_tracking_mask.set{wm_mask_for_local_seeding_mask}
-
-dwi_and_grad_for_rf
-    .join(b0_mask_for_rf)
+dwi_and_grad_for_dti_metrics
+    .join(b0_mask)
     .set{dwi_b0_for_rf}
 
 (unique_frf, all_frf_to_collect) = Compute_FRF(dwi_b0_for_rf)
@@ -932,7 +865,7 @@ if (params.mean_frf) {
 }
 
 dwi_and_grad_for_fodf
-    .join(b0_mask_for_fodf)
+    .join(b0_mask)
     .join(dti_metrics_results.fa_md)
     .join(frf_for_fodf)
     .set{dwi_b0_metrics_frf_for_fodf}
@@ -973,7 +906,7 @@ if (params.run_local_tracking){
     tracking_mask_for_local = Channel.empty()
     tracking_mask_for_local = Local_Tracking_Mask(wm_fa_for_local_tracking_mask)
 
-    wm_mask_for_local_seeding_mask
+    wm_mask_for_local_tracking_mask
     .join(dti_metrics_results.fa)
     .set{wm_fa_for_local_seeding_mask}
 
