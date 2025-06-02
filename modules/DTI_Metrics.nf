@@ -33,8 +33,8 @@ process DTI_Metrics {
     path("${sid}__residual_q3_residuals.npy")
     path("${sid}__residual_residuals_stats.png")
     path("${sid}__residual_std_residuals.npy")
-    tuple val(sid), path("${sid}__fa.nii.gz"), path("${sid}__md.nii.gz"), emit: fa_md_for_fodf
-    tuple val(sid), path("${sid}__fa.nii.gz"), emit: fa_for_reg
+    tuple val(sid), path("${sid}__fa.nii.gz"), path("${sid}__md.nii.gz"), emit: fa_md
+    tuple val(sid), path("${sid}__fa.nii.gz"), emit: fa
         //fa_for_reg, fa_for_pft_tracking, fa_for_local_tracking_mask, fa_for_local_seeding_mask
 
     script:

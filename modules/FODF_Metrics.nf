@@ -7,7 +7,7 @@ process FODF_Metrics {
         path(md), path(frf) // from dwi_b0_metrics_frf_for_fodf
 
     output:
-    tuple val(sid), path("${sid}__fodf.nii.gz"), emit: fodf_for_pft_tracking // fodf_for_local_tracking
+    tuple val(sid), path("${sid}__fodf.nii.gz"), emit: fodf // fodf_for_local_tracking
     path("${sid}__peaks.nii.gz")
     path("${sid}__peak_indices.nii.gz")
     path("${sid}__afd_max.nii.gz")

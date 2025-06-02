@@ -1,4 +1,4 @@
-#!/usr/bin/env nextflow
+
 
 nextflow.enable.dsl=2
 
@@ -853,11 +853,6 @@ dwi_and_grad_for_dti_metrics
 
 dti_metrics_results = Channel.empty()
 dti_metrics_results = DTI_Metrics(dwi_and_grad_for_dti_metrics)
-def fa_md_for_fodf = dti_metrics_results.fa_md_for_fodf
-def fa_for_reg = dti_metrics_results.fa_for_reg
-def fa_for_pft_tracking = dti_metrics_results.fa_for_reg
-def fa_for_local_tracking_mask = dti_metrics_results.fa_for_reg
-def fa_for_local_seeding_mask = dti_metrics_results.fa_for_reg
 
 dwi_for_extract_fodf_shell
     .join(gradients_for_fodf_shell)
@@ -868,7 +863,7 @@ dwi_and_grad_for_fodf = Channel.empty()
 dwi_and_grad_for_fodf = Extract_FODF_Shell(dwi_and_grad_for_extract_fodf_shell)
 
 t1_and_mask_for_reg
-    .join(fa_for_reg)
+    .join(dti_metrics_results.fa)
     .join(b0_for_reg)
     .set{t1_fa_b0_for_reg}
 
@@ -938,26 +933,25 @@ if (params.mean_frf) {
 
 dwi_and_grad_for_fodf
     .join(b0_mask_for_fodf)
-    .join(fa_md_for_fodf)
+    .join(dti_metrics_results.fa_md)
     .join(frf_for_fodf)
     .set{dwi_b0_metrics_frf_for_fodf}
 
 fodfs_m = Channel.empty()
 fodfs_m = FODF_Metrics(dwi_b0_metrics_frf_for_fodf)
-def fodf_for_pft_tracking = fodfs_m.fodf_for_pft_tracking
-def fodf_for_local_tracking = fodfs_m.fodf_for_pft_tracking
+
 
 if (params.run_pft_tracking){
     (pft_maps_for_pft_tracking, interface_for_pft_seeding_mask) = PFT_Tracking_Maps(map_wm_gm_csf_for_pft_maps)
     wm_mask_for_pft_tracking
-    .join(fa_for_pft_tracking)
+    .join(dti_metrics_results.fa)
     .join(interface_for_pft_seeding_mask)
     .set{wm_fa_int_for_pft}
 
     seeding_mask_for_pft = Channel.empty()
     seeding_mask_for_pft = PFT_Seeding_Mask(wm_fa_int_for_pft)
 
-    fodf_for_pft_tracking
+    fodfs_m.fodf
     .join(pft_maps_for_pft_tracking)
     .join(seeding_mask_for_pft)
     .set{fodf_maps_for_pft_tracking}
@@ -973,20 +967,20 @@ if (params.run_pft_tracking){
 if (params.run_local_tracking){
 
     wm_mask_for_local_tracking_mask
-    .join(fa_for_local_tracking_mask)
+    .join(dti_metrics_results.fa)
     .set{wm_fa_for_local_tracking_mask}
 
     tracking_mask_for_local = Channel.empty()
     tracking_mask_for_local = Local_Tracking_Mask(wm_fa_for_local_tracking_mask)
 
     wm_mask_for_local_seeding_mask
-    .join(fa_for_local_seeding_mask)
+    .join(dti_metrics_results.fa)
     .set{wm_fa_for_local_seeding_mask}
 
     tracking_seeding_mask_for_local = Channel.empty()
     tracking_seeding_mask_for_local = Local_Seeding_Mask(wm_fa_for_local_seeding_mask)
 
-    fodf_for_local_tracking
+    fodfs_m.fodf
     .join(tracking_mask_for_local)
     .join(tracking_seeding_mask_for_local)
     .set{fodf_maps_for_local_tracking}
