@@ -477,13 +477,12 @@ dwi_
 
 dwi_denoised_for_mix = Channel.empty()
 dwi_gibbs_for_mix = Channel.empty()
-
-
-
+b0_mask_for_eddy = Channel.empty()
 
 if ((rev_b0_counter == 0 && number_rev_dwi == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
     bet_prelim_dwi_results = Channel.empty()
     bet_prelim_dwi_results = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, number_rev_dwi)
+    b0_mask_for_eddy = bet_prelim_dwi_results.b0_mask_for_eddy // this logic is necessary inside ifs
 }
 
 if (params.run_dwi_denoising){
@@ -650,7 +649,7 @@ dwi_for_eddy
     .combine(gradients_, by: [0,1])
     .filter{ it[1] == "_" }
     .map{ [it[0], it[2], it[3], it[4]] }
-    .join(bet_prelim_dwi_results.b0_mask_for_eddy)
+    .join(b0_mask_for_eddy)
     .join(readout_encoding_)
     .set{dwi_gradients_mask_topup_files_for_eddy}
 
