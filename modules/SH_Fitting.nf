@@ -1,5 +1,5 @@
 process SH_Fitting {
-    cpus 1
+
 
     input:
     tuple val(sid), path(dwi), path(bval), path(bvec) //from dwi_and_grad_for_sh_fitting

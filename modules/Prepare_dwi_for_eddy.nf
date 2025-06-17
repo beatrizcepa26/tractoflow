@@ -1,5 +1,5 @@
 process Prepare_dwi_for_eddy {
-  cpus 2
+
 
   input:
     tuple val(sid), file(dwi), file(bval), file(bvec), file(rev_dwi), file(rev_bval), \

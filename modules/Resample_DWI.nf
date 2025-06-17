@@ -1,5 +1,5 @@
 process Resample_DWI {
-    cpus 3
+
 
     input:
     tuple val(sid), path(dwi), path(mask) //from dwi_mask_for_resample

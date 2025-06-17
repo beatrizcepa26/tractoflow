@@ -1,5 +1,5 @@
 process Bet_T1 {
-    cpus params.processes_brain_extraction_t1
+
 
     input:
     tuple val(sid), path(t1) // from t1_for_bet

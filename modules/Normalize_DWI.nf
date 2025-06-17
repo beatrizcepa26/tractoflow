@@ -1,5 +1,5 @@
 process Normalize_DWI {
-    cpus 3
+
     label 'big_mem'
 
     input:

@@ -1,5 +1,5 @@
 process PFT_Seeding_Mask {
-    cpus 1
+
 
     input:
     tuple val(sid), path(wm), path(fa), path(interface_mask) // from wm_fa_int_for_pft

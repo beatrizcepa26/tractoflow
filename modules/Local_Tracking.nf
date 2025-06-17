@@ -1,5 +1,5 @@
 process Local_Tracking {
-    cpus { params.processes_local_tracking * task.attempt }
+
     memory { 5.GB * task.attempt }
 
     input:

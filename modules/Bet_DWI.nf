@@ -1,5 +1,5 @@
 process Bet_DWI {
-    cpus 2
+
     label 'big_mem'
 
     input:

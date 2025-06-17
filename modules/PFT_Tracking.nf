@@ -1,5 +1,5 @@
 process PFT_Tracking {
-    cpus 2
+
 
     input:
     tuple val(sid), path(fodf), path(incl), path(exclude), path(seed)   // include -> incl do to conflit

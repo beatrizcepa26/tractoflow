@@ -1,5 +1,5 @@
 process N4_T1 {
-    cpus 1
+
 
     input:
     tuple val(sid), path(t1) // from t1_for_n4

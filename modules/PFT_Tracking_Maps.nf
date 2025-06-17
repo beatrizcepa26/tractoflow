@@ -1,5 +1,5 @@
 process PFT_Tracking_Maps {
-    cpus 1
+
 
     input:
     tuple val(sid), path(wm), path(gm), path(csf) // from map_wm_gm_csf_for_pft_maps

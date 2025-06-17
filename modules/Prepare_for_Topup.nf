@@ -1,5 +1,5 @@
 process Prepare_for_Topup {
-  cpus 2
+
 
   input:
     tuple val(sid), val(rev), file(dwi), file(bval), path(bvec) //from dwi_gradients_rev_b0_for_prepare_topup

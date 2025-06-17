@@ -1,5 +1,5 @@
 process Extract_B0 {
-    cpus 3
+
     label 'big_mem'
 
     input:

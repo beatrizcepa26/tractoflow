@@ -1,5 +1,5 @@
 process Segment_Freesurfer {
-    cpus 1
+
 
     input:
     tuple val(sid), path(aparc), path(wmparc) //from labels_for_segmentation

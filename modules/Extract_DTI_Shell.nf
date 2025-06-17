@@ -1,5 +1,5 @@
 process Extract_DTI_Shell {
-    cpus 3
+
     label 'big_mem'
 
     input:

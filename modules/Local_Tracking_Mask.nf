@@ -1,5 +1,5 @@
 process Local_Tracking_Mask {
-    cpus 1
+
 
     input:
     tuple val(sid), path(wm), path(fa) // from wm_fa_for_local_tracking_mask

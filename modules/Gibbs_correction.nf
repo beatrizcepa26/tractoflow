@@ -1,5 +1,5 @@
 process Gibbs_correction {
-    cpus params.processes_denoise_dwi
+
 
     input:
     tuple val(sid), val(rev), path(dwi)  //from dwi_for_gibbs

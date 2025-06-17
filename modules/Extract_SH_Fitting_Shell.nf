@@ -1,5 +1,5 @@
 process Extract_SH_Fitting_Shell {
-    cpus 3
+
 
     input:
     tuple val(sid), path(dwi), path(bval), path(bvec)\

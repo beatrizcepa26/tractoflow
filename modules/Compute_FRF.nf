@@ -1,5 +1,5 @@
 process Compute_FRF {
-    cpus 3
+
     label 'big_mem'
 
     input:

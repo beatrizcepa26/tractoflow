@@ -1,5 +1,5 @@
 process N4_DWI {
-    cpus 1
+
     label 'big_mem'
 
     input:

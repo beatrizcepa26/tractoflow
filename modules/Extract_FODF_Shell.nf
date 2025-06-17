@@ -1,5 +1,5 @@
 process Extract_FODF_Shell {
-    cpus 3
+
     label 'big_mem'
 
     input:

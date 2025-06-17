@@ -1,5 +1,5 @@
 process DTI_Metrics {
-    cpus 3
+
     label 'big_mem'
 
     input:

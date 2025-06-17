@@ -1,5 +1,5 @@
 process Register_Freesurfer {
-    cpus 1
+
 
     input:
     tuple val(sid), path(aparc), path(wmparc), path(t1), path(affine),

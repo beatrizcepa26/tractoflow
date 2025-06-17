@@ -1,5 +1,5 @@
 process Eddy {
-    cpus { params.processes_eddy * task.attempt }
+
     memory { 5.GB * task.attempt }
 
     input:

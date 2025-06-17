@@ -1,5 +1,5 @@
 process FODF_Metrics {
-    cpus params.processes_fodf
+
     label 'big_mem'
 
     input:
