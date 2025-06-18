@@ -474,16 +474,25 @@ README()
 dwi_
     .combine(gradients_, by: [0,1])
     .set{dwi_gradient_for_prelim_bet}
-
 dwi_denoised_for_mix = Channel.empty()
 dwi_gibbs_for_mix = Channel.empty()
 b0_mask_for_eddy = Channel.empty()
 
-if ((rev_b0_counter == 0 && number_rev_dwi == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)){
-    bet_prelim_dwi_results = Channel.empty()
-    bet_prelim_dwi_results = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, number_rev_dwi)
-    b0_mask_for_eddy = bet_prelim_dwi_results.b0_mask_for_eddy // this logic is necessary inside ifs
+
+
+rev_b0_counter
+    .combine(number_rev_dwi)
+    .map { r, n ->
+        def condition = (r == 0 && n == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)
+        return condition
+    }
+    .set { run_bet_prelim_dwi }
+
+if (run_bet_prelim_dwi){
+	bet_prelim_dwi_results = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, number_rev_dwi)
+	b0_mask_for_eddy = bet_prelim_dwi_results.b0_mask_for_eddy
 }
+
 
 if (params.run_dwi_denoising){
     dwi_denoised_for_mix = Denoise_DWI(dwi_)
@@ -562,12 +571,16 @@ simple_b0_for_topup
 }
 .set{branch_b0_for_topup}
 
+
+
 branch_b0_for_topup.reverse_b0
 .mix(rev_b0_for_topup)
 .join(branch_b0_for_topup.forward_b0)
 .mix(complex_rev_b0_for_topup)
 .join(readout_encoding_)
 .set{rev_b0_with_readout_encoding_for_topup}
+
+
 
 topup_results = Channel.empty()
 topup_files_for_eddy_topup = Channel.empty()
@@ -637,13 +650,13 @@ rev_b0_counter
     .filter{it}
     .set{eddy_t_trigger}
 
+
 // This condition and the Eddy process condition were moved to Channel logic to assure all variables are available at runtime 
 if (eddy_t_trigger){ 
         eddy_topup_r = Eddy_Topup(dwi_gradients_mask_topup_files_for_eddy_topup, rev_b0_counter, number_rev_dwi)
         dwi_from_eddy_topup = eddy_topup_r.dwi_from_eddy_topup
         gradients_from_eddy_topup = eddy_topup_r.gradients_from_eddy_topup  
 }
-
 
 dwi_for_eddy
     .combine(gradients_, by: [0,1])
@@ -652,7 +665,6 @@ dwi_for_eddy
     .join(b0_mask_for_eddy)
     .join(readout_encoding_)
     .set{dwi_gradients_mask_topup_files_for_eddy}
-
 
 dwi_from_eddy = Channel.empty()
 gradients_from_eddy = Channel.empty()
