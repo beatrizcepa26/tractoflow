@@ -1,5 +1,5 @@
 process Eddy_Topup {
-
+    label 'gpu_capable'
     memory { 5.GB * task.attempt }
 
     input:

@@ -1,5 +1,5 @@
 process Local_Tracking {
-
+    label 'gpu_capable'
     memory { 5.GB * task.attempt }
 
     input:
