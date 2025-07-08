@@ -1,6 +1,5 @@
 process Eddy_Topup {
     label 'gpu_capable'
-    memory { 5.GB * task.attempt }
 
     input:
     tuple val(sid), file(dwi), file(bval), file(bvec), val(number_rev_dwi), file(b0s_corrected),

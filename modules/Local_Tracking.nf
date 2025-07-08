@@ -1,6 +1,5 @@
 process Local_Tracking {
     label 'gpu_capable'
-    memory { 5.GB * task.attempt }
 
     input:
     tuple val(sid), path(fodf), path(tracking_mask), path(seed)\

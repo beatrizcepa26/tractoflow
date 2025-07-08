@@ -1,6 +1,5 @@
 process Eddy {
     label 'gpu_capable'
-    memory { 5.GB * task.attempt }
 
     input:
     tuple val(sid), path(dwi), path(bval), path(bvec), path(mask), val(readout), val(encoding)
