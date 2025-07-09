@@ -150,7 +150,38 @@ if(params.help) {
                 "processes_eddy":"$params.processes_eddy",
                 "processes_fodf":"$params.processes_fodf",
                 "processes_registration":"$params.processes_registration",
-                "processes_local_tracking":"$params.processes_local_tracking"]
+                "processes_local_tracking":"$params.processes_local_tracking",
+
+                "processes_bet_prelim_dwi": "$params.processes_bet_prelim_dwi",
+                "processes_bet_dwi": "$params.processes_bet_dwi",
+                "process_prep_topup": "$params.process_prep_topup",
+                "process_topup": "$params.process_topup",
+                "process_prep_dwi_eddy": "$params.process_prep_dwi_eddy",
+                "process_n4_t1": "$params.process_n4_t1",
+                "process_n4_dwi": "$params.process_n4_dwi",
+                "process_crop_dwi": "$params.process_crop_dwi",
+                "process_crop_t1": "$params.process_crop_t1",
+                "process_resample_t1": "$params.process_resample_t1",
+                "process_normalize_dwi": "$params.process_normalize_dwi",
+                "process_resample_dwi": "$params.process_resample_dwi",
+                "process_gibbs_correction": "$params.process_gibbs_correction",
+                "process_dti_metrics": "$params.process_dti_metrics",
+                "process_dti_shell": "$params.process_dti_shell",
+                "process_fodf_shell": "$params.process_fodf_shell",
+                "process_register_freesurfer": "$params.process_register_freesurfer",
+                "process_segment_freesurfer": "$params.process_segment_freesurfer",
+                "process_segment_tissues": "$params.process_segment_tissues",
+                "process_compute_frf": "$params.process_compute_frf",
+                "process_mean_frf": "$params.process_mean_frf",
+                "process_pft_seeding_mask": "$params.process_pft_seeding_mask",
+                "process_pft_tracking_maps": "$params.process_pft_tracking_maps",
+                "process_pft_tracking": "$params.process_pft_tracking",
+                "process_local_t_mask": "$params.process_local_t_mask",
+                "process_local_seed_mask": "$params.process_local_seed_mask",
+                "process_extract_sh_fit_shell": "$params.process_extract_sh_fit_shell",
+                "process_extract_b0": "$params.process_extract_b0",
+                "process_sh_fitting": "$params.process_sh_fitting"
+                ]
 
     engine = new groovy.text.SimpleTemplateEngine()
     template = engine.createTemplate(usage.text).make(bindings)
@@ -932,12 +963,16 @@ if (params.run_local_tracking){
 Local_Tracking(fodf_maps_for_local_tracking, local_random_seed)
 }
 
+}
+
 workflow.onComplete {
     log.info "Pipeline completed at: $workflow.complete"
     log.info "Execution status: ${ workflow.success ? 'OK' : 'failed' }"
     log.info "Execution duration: $workflow.duration"
 }
-}
+
+
+
 
 
 

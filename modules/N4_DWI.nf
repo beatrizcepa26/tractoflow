@@ -1,6 +1,7 @@
 process N4_DWI {
 
     label 'big_mem'
+    cpus params.process_n4_dwi
 
     input:
     tuple val(sid), path(dwi), path(b0), path(b0_mask)

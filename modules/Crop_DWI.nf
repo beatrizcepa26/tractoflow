@@ -1,5 +1,5 @@
 process Crop_DWI {
-
+    cpus params.process_crop_dwi
     label 'big_mem'
 
     input:

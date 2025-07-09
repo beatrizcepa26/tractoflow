@@ -1,5 +1,5 @@
 process Register_T1 {
-
+    cpus params.processes_registration
 
     input:
     tuple val(sid), path(t1), path(t1_mask), path(fa), path(b0) // from t1_fa_b0_for_reg

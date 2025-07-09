@@ -1,5 +1,5 @@
 process Local_Seeding_Mask {
-
+    cpus params.process_local_seed_mask
 
     input:
     tuple val(sid), path(wm), path(fa) // from wm_fa_for_local_seeding_mask

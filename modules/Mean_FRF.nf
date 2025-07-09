@@ -2,6 +2,7 @@ process Mean_FRF {
 
     publishDir params.Mean_FRF_Publish_Dir
     tag "All_FRF"
+    cpus params.process_mean_frf
 
     input:
     path(all_frf) // from all_frf_for_mean_frf

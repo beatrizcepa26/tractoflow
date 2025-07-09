@@ -1,5 +1,6 @@
 process Local_Tracking {
     label 'gpu_capable'
+    cpus params.processes_local_tracking
 
     input:
     tuple val(sid), path(fodf), path(tracking_mask), path(seed)\
