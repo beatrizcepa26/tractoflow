@@ -15,7 +15,7 @@ process Denoise_T1 {
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
-    scil_run_nlmeans.py $t1 ${sid}__t1_denoised.nii.gz 1 \
+    scil_denoising_nlmeans.py $t1 ${sid}__t1_denoised.nii.gz 1 \
         --processes $task.cpus -f
     """
 }

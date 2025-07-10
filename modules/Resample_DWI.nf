@@ -15,12 +15,12 @@ process Resample_DWI {
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
-    scil_resample_volume.py $dwi \
+    scil_volume_resample.py $dwi \
         dwi_resample.nii.gz \
         --voxel_size $params.dwi_resolution \
         --interp  $params.dwi_interpolation
     fslmaths dwi_resample.nii.gz -thr 0 dwi_resample_clipped.nii.gz
-    scil_resample_volume.py $mask \
+    scil_volume_resample.py $mask \
         mask_resample.nii.gz \
         --ref dwi_resample.nii.gz \
         --enforce_dimensions \

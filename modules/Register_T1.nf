@@ -41,6 +41,6 @@ process Register_T1 {
     antsApplyTransforms -d 3 -i $t1_mask -r ${sid}__t1_warped.nii.gz \
         -o ${sid}__t1_mask_warped.nii.gz -n NearestNeighbor \
         -t ${sid}__output1Warp.nii.gz ${sid}__output0GenericAffine.mat
-    scil_image_math.py convert ${sid}__t1_mask_warped.nii.gz ${sid}__t1_mask_warped.nii.gz --data_type uint8 -f
+    scil_volume_math.py convert ${sid}__t1_mask_warped.nii.gz ${sid}__t1_mask_warped.nii.gz --data_type uint8 -f
     """
 }

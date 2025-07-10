@@ -28,7 +28,7 @@ process Eddy_Topup {
         mrconvert $b0s_corrected b0_corrected.nii.gz -coord 3 0 -axes 0,1,2 -nthreads 1
         bet b0_corrected.nii.gz ${sid}__b0_bet.nii.gz -m -R\
             -f $params.bet_topup_before_eddy_f
-        scil_prepare_eddy_command.py $dwi $bval $bvec ${sid}__b0_bet_mask.nii.gz\
+        scil_dwi_prepare_eddy_command.py $dwi $bval $bvec ${sid}__b0_bet_mask.nii.gz\
             --topup $params.prefix_topup --eddy_cmd $params.eddy_cmd\
             --b0_thr $params.b0_thr_extract_b0\
             --encoding_direction $encoding\
@@ -45,7 +45,7 @@ process Eddy_Topup {
 	   mv dwi_eddy_corrected.eddy_rotated_bvecs ${sid}__dwi_eddy_corrected.bvec
           mv $bval ${sid}__bval_eddy
 	else
-	   scil_validate_and_correct_eddy_gradients.py dwi_eddy_corrected.eddy_rotated_bvecs $bval ${number_rev_dwi} ${sid}__dwi_eddy_corrected.bvec ${sid}__bval_eddy
+	   scil_gradients_validate_correct_eddy.py dwi_eddy_corrected.eddy_rotated_bvecs $bval ${number_rev_dwi} ${sid}__dwi_eddy_corrected.bvec ${sid}__bval_eddy
 	fi
 	"""
 }

@@ -16,7 +16,7 @@ process PFT_Seeding_Mask {
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
-        scil_image_math.py union $wm $interface_mask ${sid}__pft_seeding_mask.nii.gz\
+        scil_volume_math.py union $wm $interface_mask ${sid}__pft_seeding_mask.nii.gz\
             --data_type uint8
         """
     else if (params.pft_seeding_mask_type == "interface")

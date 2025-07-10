@@ -19,11 +19,11 @@ process Bet_Prelim_DWI {
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
-    scil_image_math.py convert $dwi $dwi --data_type float32 -f
-    scil_extract_b0.py $dwi $bval $bvec ${sid}__b0.nii.gz --mean\
+    scil_volume_math.py convert $dwi $dwi --data_type float32 -f
+    scil_dwi_extract_b0.py $dwi $bval $bvec ${sid}__b0.nii.gz --mean\
         --b0_thr $params.b0_thr_extract_b0 --force_b0_threshold
     bet ${sid}__b0.nii.gz ${sid}__b0_bet.nii.gz -m -R -f $params.bet_prelim_f
-    scil_image_math.py convert ${sid}__b0_bet_mask.nii.gz ${sid}__b0_bet_mask.nii.gz --data_type uint8 -f
+    scil_volume_math.py convert ${sid}__b0_bet_mask.nii.gz ${sid}__b0_bet_mask.nii.gz --data_type uint8 -f
     maskfilter ${sid}__b0_bet_mask.nii.gz dilate ${sid}__b0_bet_mask_dilated.nii.gz\
         --npass $params.dilate_b0_mask_prelim_brain_extraction -nthreads 1
     mrcalc ${sid}__b0.nii.gz ${sid}__b0_bet_mask_dilated.nii.gz\

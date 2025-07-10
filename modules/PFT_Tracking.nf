@@ -19,7 +19,7 @@ process PFT_Tracking {
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
-        scil_compute_pft.py $fodf $seed $incl $exclude\
+        scil_tracking_pft.py $fodf $seed $incl $exclude\
             tmp.trk\
             --algo $params.pft_algo --$params.pft_seeding $params.pft_nbr_seeds\
             --seed $curr_seed --step $params.pft_step --theta $params.pft_theta\
@@ -27,7 +27,7 @@ process PFT_Tracking {
             --min_length $params.pft_min_len --max_length $params.pft_max_len\
             --particles $params.pft_particles --back $params.pft_back\
             --forward $params.pft_front $compress --sh_basis $params.basis
-        scil_remove_invalid_streamlines.py tmp.trk\
+        scil_tractogram_remove_invalid.py tmp.trk\
             ${sid}__pft_tracking_${params.pft_algo}_${params.pft_seeding_mask_type}_seed_${curr_seed}.trk\
             --remove_single_point
         """

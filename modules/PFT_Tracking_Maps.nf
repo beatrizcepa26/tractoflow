@@ -17,7 +17,7 @@ process PFT_Tracking_Maps {
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
-    scil_compute_maps_for_particle_filter_tracking.py $wm $gm $csf \
+    scil_tracking_pft_maps.py $wm $gm $csf \
         --include ${sid}__map_include.nii.gz \
         --exclude ${sid}__map_exclude.nii.gz \
         --interface ${sid}__interface.nii.gz -f

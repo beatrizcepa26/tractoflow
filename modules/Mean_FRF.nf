@@ -17,6 +17,6 @@ process Mean_FRF {
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
-    scil_compute_mean_frf.py $all_frf mean_frf.txt
+    scil_frf_mean.py $all_frf mean_frf.txt
     """
 }

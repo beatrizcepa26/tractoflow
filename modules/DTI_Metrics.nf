@@ -42,7 +42,7 @@ process DTI_Metrics {
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
-    scil_compute_dti_metrics.py $dwi $bval $bvec --mask $b0_mask\
+    scil_dti_metrics.py $dwi $bval $bvec --mask $b0_mask\
         --ad ${sid}__ad.nii.gz --evecs ${sid}__evecs.nii.gz\
         --evals ${sid}__evals.nii.gz --fa ${sid}__fa.nii.gz\
         --ga ${sid}__ga.nii.gz --rgb ${sid}__rgb.nii.gz\

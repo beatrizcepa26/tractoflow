@@ -17,7 +17,7 @@ process Extract_FODF_Shell {
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
-        scil_extract_dwi_shell.py $dwi \
+        scil_dwi_extract_shell.py $dwi \
           $bval $bvec $params.fodf_shells ${sid}__dwi_fodf.nii.gz \
           ${sid}__bval_fodf ${sid}__bvec_fodf -t $params.dwi_shell_tolerance -f
       """
@@ -31,7 +31,7 @@ process Extract_FODF_Shell {
       awk -F' ' '{v=int(\$1)}{if(v>=$params.min_fodf_shell_value|| \
       v<=$params.b0_thr_extract_b0)print v}' | uniq)
 
-      scil_extract_dwi_shell.py $dwi \
+      scil_dwi_extract_shell.py $dwi \
         $bval $bvec \$shells ${sid}__dwi_fodf.nii.gz \
         ${sid}__bval_fodf ${sid}__bvec_fodf -t $params.dwi_shell_tolerance -f
       """

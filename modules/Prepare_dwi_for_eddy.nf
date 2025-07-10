@@ -13,7 +13,7 @@ process Prepare_dwi_for_eddy {
 
   script:
   """
-    scil_concatenate_dwi.py ${sid}__concatenated_dwi.nii.gz ${sid}__concatenated_dwi.bval ${sid}__concatenated_dwi.bvec -f\
+    scil_dwi_concatenate.py ${sid}__concatenated_dwi.nii.gz ${sid}__concatenated_dwi.bval ${sid}__concatenated_dwi.bvec -f\
       --in_dwis ${dwi} ${rev_dwi} --in_bvals ${bval} ${rev_bval}\
       --in_bvecs ${bvec} ${rev_bvec}
 
