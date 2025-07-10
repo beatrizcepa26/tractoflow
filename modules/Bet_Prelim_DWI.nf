@@ -21,7 +21,7 @@ process Bet_Prelim_DWI {
     export OPENBLAS_NUM_THREADS=1
     scil_volume_math.py convert $dwi $dwi --data_type float32 -f
     scil_dwi_extract_b0.py $dwi $bval $bvec ${sid}__b0.nii.gz --mean\
-        --b0_thr $params.b0_thr_extract_b0 --force_b0_threshold
+        --b0_thr $params.b0_thr_extract_b0 --skip_b0_validation
     bet ${sid}__b0.nii.gz ${sid}__b0_bet.nii.gz -m -R -f $params.bet_prelim_f
     scil_volume_math.py convert ${sid}__b0_bet_mask.nii.gz ${sid}__b0_bet_mask.nii.gz --data_type uint8 -f
     maskfilter ${sid}__b0_bet_mask.nii.gz dilate ${sid}__b0_bet_mask_dilated.nii.gz\
