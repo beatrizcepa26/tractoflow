@@ -18,7 +18,7 @@ process Extract_B0 {
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
     scil_dwi_extract_b0.py $dwi $bval $bvec ${sid}__b0_resampled.nii.gz --mean\
-        --b0_thr $params.b0_thr_extract_b0 --force_b0_threshold
+        --b0_thr $params.b0_thr_extract_b0 --skip_b0_check
     mrthreshold ${sid}__b0_resampled.nii.gz ${sid}__b0_mask_resampled.nii.gz\
         --abs 0.00001 -nthreads 1
     """

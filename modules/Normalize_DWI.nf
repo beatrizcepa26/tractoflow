@@ -19,7 +19,7 @@ process Normalize_DWI {
           $bval $bvec $params.dti_shells dwi_dti.nii.gz \
           bval_dti bvec_dti -t $params.dwi_shell_tolerance
       scil_dti_metrics.py dwi_dti.nii.gz bval_dti bvec_dti --mask $mask\
-          --not_all --fa fa.nii.gz --force_b0_threshold
+          --not_all --fa fa.nii.gz --skip_b0_check
       mrthreshold fa.nii.gz ${sid}_fa_wm_mask.nii.gz -abs $params.fa_mask_threshold -nthreads 1
       dwinormalise individual $dwi ${sid}_fa_wm_mask.nii.gz ${sid}__dwi_normalized.nii.gz\
           -fslgrad $bvec $bval -nthreads 1
@@ -36,7 +36,7 @@ process Normalize_DWI {
             $bval $bvec \$shells dwi_dti.nii.gz \
             bval_dti bvec_dti -t $params.dwi_shell_tolerance
         scil_dti_metrics.py dwi_dti.nii.gz bval_dti bvec_dti --mask $mask\
-            --not_all --fa fa.nii.gz --force_b0_threshold
+            --not_all --fa fa.nii.gz --skip_b0_check
         mrthreshold fa.nii.gz ${sid}_fa_wm_mask.nii.gz -abs $params.fa_mask_threshold -nthreads 1
         dwinormalise individual $dwi ${sid}_fa_wm_mask.nii.gz ${sid}__dwi_normalized.nii.gz\
             -fslgrad $bvec $bval -nthreads 1

@@ -21,7 +21,7 @@ process FODF_Metrics {
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
     scil_fodf_ssst.py $dwi $bval $bvec $frf ${sid}__fodf.nii.gz\
-        --sh_order $params.sh_order --sh_basis $params.basis --force_b0_threshold\
+        --sh_order $params.sh_order --sh_basis $params.basis --skip_b0_check\
         --mask $b0_mask --processes $task.cpus
 
     scil_fodf_max_in_ventricles.py ${sid}__fodf.nii.gz $fa $md\

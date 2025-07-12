@@ -13,6 +13,6 @@ process Prepare_for_Topup {
   script:
   """
     scil_dwi_extract_b0.py $dwi $bval $bvec ${sid}_${rev}b0_mean.nii.gz --mean\
-        --b0_thr $params.b0_thr_extract_b0 --force_b0_threshold
+        --b0_thr $params.b0_thr_extract_b0 --skip_b0_check
   """
 }

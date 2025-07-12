@@ -18,7 +18,7 @@ process Compute_FRF {
         export OPENBLAS_NUM_THREADS=1
         scil_frf_ssst.py $dwi $bval $bvec frf.txt --mask $b0_mask\
         --fa $params.fa --min_fa $params.min_fa --min_nvox $params.min_nvox\
-        --roi_radii $params.roi_radius --force_b0_threshold
+        --roi_radii $params.roi_radius --skip_b0_check
         scil_frf_set_diffusivities.py frf.txt $params.manual_frf ${sid}__frf.txt
         """
     else
@@ -28,6 +28,6 @@ process Compute_FRF {
         export OPENBLAS_NUM_THREADS=1
         scil_frf_ssst.py $dwi $bval $bvec ${sid}__frf.txt --mask $b0_mask\
         --fa $params.fa --min_fa $params.min_fa --min_nvox $params.min_nvox\
-        --roi_radii $params.roi_radius --force_b0_threshold
+        --roi_radii $params.roi_radius --skip_b0_check
         """
 }

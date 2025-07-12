@@ -30,3 +30,4 @@ process Bet_Prelim_DWI {
         -mult ${sid}__b0_bet.nii.gz -quiet -force -nthreads 1
     """
 }
+

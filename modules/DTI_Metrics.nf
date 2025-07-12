@@ -52,6 +52,6 @@ process DTI_Metrics {
         --non-physical ${sid}__nonphysical.nii.gz\
         --pulsation ${sid}__pulsation.nii.gz\
         --residual ${sid}__residual.nii.gz\
-        -f --force_b0_threshold
+        -f --skip_b0_check
     """
 }
