@@ -152,7 +152,7 @@ if(params.help) {
                 "processes_registration":"$params.processes_registration",
                 "processes_local_tracking":"$params.processes_local_tracking",
 
-                "processes":"$params.processes",
+                "processes_cpus":"$params.processes_cpus",
                 "processes_bet_prelim_dwi": "$params.processes_bet_prelim_dwi",
                 "processes_bet_dwi": "$params.processes_bet_dwi",
                 "process_prep_topup": "$params.process_prep_topup",

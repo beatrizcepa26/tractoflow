@@ -1,5 +1,5 @@
 process Bet_DWI {
-    cpus params.processes ?: params.processes_bet_dwi
+    cpus params.processes_cpus ?: params.processes_bet_dwi
     label 'big_mem'
 
     input:

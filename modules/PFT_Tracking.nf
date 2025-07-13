@@ -1,6 +1,6 @@
 process PFT_Tracking {
 
-    cpus params.processes ?: params.process_pft_tracking
+    cpus params.processes_cpus ?: params.process_pft_tracking
 
     input:
     tuple val(sid), path(fodf), path(incl), path(exclude), path(seed)   // include -> incl do to conflit

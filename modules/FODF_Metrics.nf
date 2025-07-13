@@ -1,6 +1,6 @@
 process FODF_Metrics {
     label 'big_mem'
-    cpus params.processes ?: params.processes_fodf
+    cpus params.processes_cpus ?: params.processes_fodf
 
     input:
     tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask), path(fa),

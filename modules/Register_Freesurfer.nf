@@ -1,5 +1,5 @@
 process Register_Freesurfer {
-    cpus params.processes ?: params.process_register_freesurfer
+    cpus params.processes_cpus ?: params.process_register_freesurfer
 
     input:
     tuple val(sid), path(aparc), path(wmparc), path(t1), path(affine),

@@ -1,6 +1,6 @@
 process Extract_FODF_Shell {
     label 'big_mem'
-    cpus params.processes ?: params.process_fodf_shell
+    cpus params.processes_cpus ?: params.process_fodf_shell
 
     input:
     tuple val(sid), path(dwi), path(bval), path(bvec)

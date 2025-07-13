@@ -1,6 +1,6 @@
 process Resample_DWI {
 
-    cpus params.processes ?: params.process_resample_dwi
+    cpus params.processes_cpus ?: params.process_resample_dwi
 
     input:
     tuple val(sid), path(dwi), path(mask) //from dwi_mask_for_resample
