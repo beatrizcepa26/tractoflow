@@ -1,5 +1,5 @@
 process Bet_Prelim_DWI {
-    cpus params.processes_bet_prelim_dwi
+    cpus params.processes ?: params.processes_bet_prelim_dwi
 
     input:
     tuple val (sid), val (rev), path (dwi), path(bval), path (bvec) // file(bvec) from dwi_gradient_for_prelim_bet

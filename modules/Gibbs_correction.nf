@@ -1,5 +1,5 @@
 process Gibbs_correction {
-    cpus params.process_gibbs_correction
+    cpus params.processes ?: params.process_gibbs_correction
 
     input:
     tuple val(sid), val(rev), path(dwi)  //from dwi_for_gibbs

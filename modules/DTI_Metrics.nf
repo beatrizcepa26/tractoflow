@@ -1,5 +1,5 @@
 process DTI_Metrics {
-    cpus params.process_dti_metrics
+    cpus params.processes ?: params.process_dti_metrics
     label 'big_mem'
 
     input:

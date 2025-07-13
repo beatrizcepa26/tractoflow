@@ -1,5 +1,5 @@
 process Extract_B0 {
-    cpus params.process_extract_b0
+    cpus params.processes ?: params.process_extract_b0
     label 'big_mem'
 
     input:

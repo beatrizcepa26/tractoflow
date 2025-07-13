@@ -152,6 +152,7 @@ if(params.help) {
                 "processes_registration":"$params.processes_registration",
                 "processes_local_tracking":"$params.processes_local_tracking",
 
+                "processes":"$params.processes",
                 "processes_bet_prelim_dwi": "$params.processes_bet_prelim_dwi",
                 "processes_bet_dwi": "$params.processes_bet_dwi",
                 "process_prep_topup": "$params.process_prep_topup",
@@ -181,6 +182,7 @@ if(params.help) {
                 "process_extract_sh_fit_shell": "$params.process_extract_sh_fit_shell",
                 "process_extract_b0": "$params.process_extract_b0",
                 "process_sh_fitting": "$params.process_sh_fitting"
+
                 ]
 
     engine = new groovy.text.SimpleTemplateEngine()
