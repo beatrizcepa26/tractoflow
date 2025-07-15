@@ -2,16 +2,11 @@ process Extract_SH_Fitting_Shell {
     cpus params.processes_cpus ?: params.process_extract_sh_fit_shell
 
     input:
-    tuple val(sid), path(dwi), path(bval), path(bvec)\
-        //from dwi_and_grad_for_extract_sh_fitting_shell
+    tuple val(sid), path(dwi), path(bval), path(bvec)
 
     output:
     tuple val(sid), path("*__dwi_sh_fitting.nii.gz"), path("*__bval_sh_fitting"),
-        path("*__bvec_sh_fitting") 
-        //into dwi_and_grad_for_sh_fitting
-
-    //when:
-    //params.sh_fitting
+        path("*__bvec_sh_fitting"), emit : dwi_and_grad_for_sh_fitting
 
     script:
     """

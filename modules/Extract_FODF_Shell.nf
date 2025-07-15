@@ -4,12 +4,10 @@ process Extract_FODF_Shell {
 
     input:
     tuple val(sid), path(dwi), path(bval), path(bvec)
-        //from dwi_and_grad_for_extract_fodf_shell
 
     output:
     tuple val(sid), path("${sid}__dwi_fodf.nii.gz"), path("${sid}__bval_fodf"),
-        path("${sid}__bvec_fodf") 
-        // into dwi_and_grad_for_fodf
+        path("${sid}__bvec_fodf"), emit: dwi_and_grad_for_fodf
 
     script:
     if (params.fodf_shells)

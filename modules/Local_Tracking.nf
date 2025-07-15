@@ -3,15 +3,11 @@ process Local_Tracking {
     cpus params.processes_cpus ?: params.processes_local_tracking
 
     input:
-    tuple val(sid), path(fodf), path(tracking_mask), path(seed)\
-        // from fodf_maps_for_local_tracking
-    each curr_seed //from local_random_seed
+    tuple val(sid), path(fodf), path(tracking_mask), path(seed)
+    each curr_seed
 
     output:
     path("${sid}__local_tracking_${params.local_algo}_${params.local_seeding_mask_type}_seeding_${params.local_tracking_mask_type}_mask_seed_${curr_seed}.trk")
-
-    //when:
-    //    params.run_local_tracking
 
     script:
     compress =\

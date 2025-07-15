@@ -507,10 +507,11 @@ README()
 dwi_
     .combine(gradients_, by: [0,1])
     .set{dwi_gradient_for_prelim_bet}
+
+
+b0_mask_for_eddy = Channel.empty()
 dwi_denoised_for_mix = Channel.empty()
 dwi_gibbs_for_mix = Channel.empty()
-b0_mask_for_eddy = Channel.empty()
-
 
 
 rev_b0_counter
@@ -528,7 +529,8 @@ if (run_bet_prelim_dwi){
 
 
 if (params.run_dwi_denoising){
-    dwi_denoised_for_mix = Denoise_DWI(dwi_)
+    denoise_dwi_out = Denoise_DWI(dwi_)
+    dwi_denoised_for_mix = denoise_dwi_out.dwi_denoised_for_mix
 }
 
 dwi_
@@ -538,7 +540,9 @@ dwi_
 
 
 if (params.run_gibbs_correction){
-    dwi_gibbs_for_mix = Gibbs_correction(dwi_for_gibbs)
+    gibbs_out = Gibbs_correction(dwi_for_gibbs)
+    dwi_gibbs_for_mix = gibbs_out.dwi_gibbs_for_mix
+
 }
 
 dwi_for_gibbs
@@ -589,10 +593,13 @@ dwi_for_eddy
 .map{ [it[0], it[1], it[2], it[4], it[5]] }
 .set{dwi_gradients_rev_b0_for_prepare_topup}
 
+
 simple_b0_for_topup = Channel.empty()
 
 if (params.run_topup && params.run_eddy){
-    simple_b0_for_topup = Prepare_for_Topup(dwi_gradients_rev_b0_for_prepare_topup)
+    prep_topup_out = Prepare_for_Topup(dwi_gradients_rev_b0_for_prepare_topup)
+    simple_b0_for_topup = prep_topup_out.simple_b0_for_topup
+
 }
 
 simple_b0_for_topup
@@ -614,13 +621,11 @@ branch_b0_for_topup.reverse_b0
 .set{rev_b0_with_readout_encoding_for_topup}
 
 
-
-topup_results = Channel.empty()
 topup_files_for_eddy_topup = Channel.empty()
 
 if(params.run_topup && params.run_eddy){
     topup_results = Topup(rev_b0_with_readout_encoding_for_topup)
-    topup_files_for_eddy_topup = topup_results.topup_files_for_eddy_topup   // Here we use a channel so the variable 'exists' even if the process doens't
+    topup_files_for_eddy_topup = topup_results.topup_files_for_eddy_topup 
 }
 
 
@@ -647,7 +652,8 @@ branch_dwi_gradient_for_prepare_dwi_for_eddy.forward_dwi
 concatenated_dwi_for_eddy = Channel.empty()
 
 if (params.run_topup && params.run_eddy){
-    concatenated_dwi_for_eddy = Prepare_dwi_for_eddy(dwi_rev_gradient_for_prepare_dwi_for_eddy) 
+    prep_dwi_eddy_out = Prepare_dwi_for_eddy(dwi_rev_gradient_for_prepare_dwi_for_eddy) 
+    concatenated_dwi_for_eddy = prep_dwi_eddy_out.concatenated_dwi_for_eddy
 }
 // Extract subjects with reverse b0 images for Eddy
 expl1 = Channel.value(0)
@@ -674,7 +680,8 @@ concatenated_dwi_for_eddy
 
 dwi_from_eddy_topup = Channel.empty()
 gradients_from_eddy_topup = Channel.empty()
-eddy_topup_r = Channel.empty()
+dwi_from_eddy = Channel.empty()
+gradients_from_eddy = Channel.empty()
 
 
 rev_b0_counter
@@ -699,8 +706,6 @@ dwi_for_eddy
     .join(readout_encoding_)
     .set{dwi_gradients_mask_topup_files_for_eddy}
 
-dwi_from_eddy = Channel.empty()
-gradients_from_eddy = Channel.empty()
 
 rev_b0_counter
     .combine(number_rev_dwi)
@@ -709,8 +714,11 @@ rev_b0_counter
     .set{eddy_trigger}
 
 
+
 if (eddy_trigger){
-    (dwi_from_eddy, gradients_from_eddy) = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, number_rev_dwi)
+    eddy_out = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, number_rev_dwi)
+    dwi_from_eddy = eddy_out.dwi_from_eddy
+    gradients_from_eddy = eddy.gradients_from_eddy
 }
 
 dwi_for_eddy
@@ -739,22 +747,22 @@ dwi_for_bet
     .join(gradients_for_all)
     .set{dwi_gradients_for_bet}
 
-bet_dwi_r = Channel.empty()
 bet_dwi_r = Bet_DWI(dwi_gradients_for_bet)
 
+n4_dwi_out = N4_DWI(bet_dwi_r.dwi_b0_b0_mask_for_n4)
 
-dwi_for_crop = N4_DWI(bet_dwi_r.dwi_b0_b0_mask_for_n4)
-
-dwi_for_crop
+n4_dwi_out.dwi_for_crop
     .join(bet_dwi_r.b0_and_mask_for_crop)
     .set{dwi_and_b0_mask_b0_for_crop}
 
-crop_dwi_r = Channel.empty()
 crop_dwi_r = Crop_DWI(dwi_and_b0_mask_b0_for_crop)
 
 t1_for_mix_n4 = Channel.empty()
+t1_resampled_for_mix = Channel.empty()
+
 if (params.run_t1_denoising){
-    t1_for_mix_n4 = Denoise_T1(t1_for_denoise)
+    denoise_t1_out = Denoise_T1(t1_for_denoise)
+    t1_for_mix_n4 = denoise_t1_out.t1_for_mix_n4
 }
 
 t1_for_denoise
@@ -762,30 +770,26 @@ t1_for_denoise
     .mix(t1_for_mix_n4)
     .set{t1_for_n4}
 
-t1_for_resample = Channel.empty()
-t1_for_resample = N4_T1(t1_for_n4)
+n4_t1_out = N4_T1(t1_for_n4)
 
-t1_resampled_for_mix = Channel.empty()
 if (params.run_resample_t1){
-    t1_resampled_for_mix = Resample_T1(t1_for_resample)
+    resample_t1_out = Resample_T1(n4_t1_out.t1_for_resample)
+    t1_resampled_for_mix = resample_t1_out.t1_resampled_for_mix
 }
 
-t1_for_resample
+n4_t1_out.t1_for_resample
     .map{it -> if(!params.run_resample_t1){it}}
     .mix(t1_resampled_for_mix)
     .set{t1_for_bet}
 
-t1_and_mask_for_crop = Channel.empty()
-t1_and_mask_for_crop = Bet_T1(t1_for_bet)
+bet_out = Bet_T1(t1_for_bet)
 
-t1_and_mask_for_reg = Channel.empty()
-t1_and_mask_for_reg = Crop_T1(t1_and_mask_for_crop)
+crop_t1_out = Crop_T1(bet_out.t1_and_mask_for_crop)
 
 crop_dwi_r.dwi_mask_for_normalize
     .join(gradients_for_all)
     .set{dwi_mask_grad_for_normalize}
 
-normalize_dwi_r = Channel.empty()
 normalize_dwi_r = Normalize_DWI(dwi_mask_grad_for_normalize)
 
 
@@ -794,8 +798,10 @@ normalize_dwi_r.dwi_for_resample
     .set{dwi_mask_for_resample}
 
 dwi_resampled_for_mix = Channel.empty()
+
 if (params.run_resample_dwi){
-    dwi_resampled_for_mix = Resample_DWI(dwi_mask_for_resample)
+    resample_dwi_out = Resample_DWI(dwi_mask_for_resample)
+    dwi_resampled_for_mix = resample_dwi_out.dwi_resampled_for_mix
 }
 
 normalize_dwi_r.dwi_for_resample
@@ -808,8 +814,7 @@ dwi_for_extractions
     .join(gradients_for_all)
     .set{dwi_and_grad_for_extract_b0}
 
-(b0_for_reg, b0_mask) = Extract_B0(dwi_and_grad_for_extract_b0)
-
+extract_b0_out = Extract_B0(dwi_and_grad_for_extract_b0)
 
 dwi_for_extractions
     .join(gradients_for_all)
@@ -818,7 +823,8 @@ dwi_for_extractions
 dwi_and_grad_for_sh_fitting = Channel.empty()
 
 if (params.sh_fitting){
-    dwi_and_grad_for_sh_fitting = Extract_SH_Fitting_Shell(dwi_and_grad_for_extract_sh_fitting_shell)
+    ext_sh_fit_s_out = Extract_SH_Fitting_Shell(dwi_and_grad_for_extract_sh_fitting_shell)
+    dwi_and_grad_for_sh_fitting = ext_sh_fit_s_out.dwi_and_grad_for_sh_fitting
     SH_Fitting(dwi_and_grad_for_sh_fitting)
 }
 
@@ -826,40 +832,33 @@ dwi_for_extractions
     .join(gradients_for_all)
     .set{dwi_and_grad_for_extract_dti_shell}
 
-dwi_and_grad_for_dti_metrics =  Channel.empty()
-dwi_and_grad_for_dti_metrics = Extract_DTI_Shell(dwi_and_grad_for_extract_dti_shell)
 
-dwi_and_grad_for_dti_metrics
-    .join(b0_mask)
+extract_dti_s_out = Extract_DTI_Shell(dwi_and_grad_for_extract_dti_shell)
+
+extract_dti_s_out.dwi_and_grad_for_dti_metrics
+    .join(extract_b0_out.b0_mask)
     .set{dwi_and_grad_for_dti_metrics}
 
-
-dti_metrics_results = Channel.empty()
 dti_metrics_results = DTI_Metrics(dwi_and_grad_for_dti_metrics)
 
 dwi_for_extractions
     .join(gradients_for_all)
     .set{dwi_and_grad_for_extract_fodf_shell}
 
+extract_fodf_s_out = Extract_FODF_Shell(dwi_and_grad_for_extract_fodf_shell)
 
-dwi_and_grad_for_fodf = Channel.empty()
-dwi_and_grad_for_fodf = Extract_FODF_Shell(dwi_and_grad_for_extract_fodf_shell)
-
-t1_and_mask_for_reg
+crop_t1_out.t1_and_mask_for_reg
     .join(dti_metrics_results.fa)
-    .join(b0_for_reg)
+    .join(extract_b0_out.b0_for_reg)
     .set{t1_fa_b0_for_reg}
 
-register_t1_r = Channel.empty()
 register_t1_r = Register_T1(t1_fa_b0_for_reg)
-
 
 labels_for_reg
     .join(register_t1_r.t1_for_freesurfer_reg)
     .set{labels_mat_for_reg}
 
-labels_for_segmentation = Channel.empty()
-labels_for_segmentation = Register_Freesurfer(labels_mat_for_reg)
+register_fs_out = Register_Freesurfer(labels_mat_for_reg)
 
 
 wm_mask_freesurfer = Channel.empty()
@@ -869,7 +868,7 @@ wm_mask_for_pft_tracking = Channel.empty()
 segmentation_r = Channel.empty()
 
 if(params.run_tractoflow_abs){
-    segmentation_r = Segment_Freesurfer(labels_for_segmentation)
+    segmentation_r = Segment_Freesurfer(register_fs_out.labels_for_segmentation)
     wm_mask_freesurfer = segmentation_r.wm_mask_freesurfer
 }else{
     segmentation_r = Segment_Tissues(register_t1_r.t1_for_seg)
@@ -884,23 +883,25 @@ wm_mask_freesurfer
     .set{wm_mask_for_local_tracking_mask}
 
 dwi_and_grad_for_dti_metrics
-    .join(b0_mask)
+    .join(extract_b0_out.b0_mask)
     .set{dwi_b0_for_rf}
 
-(unique_frf, all_frf_to_collect) = Compute_FRF(dwi_b0_for_rf)
+compute_frf_out = Compute_FRF(dwi_b0_for_rf)
 
-unique_frf.set{unique_frf_for_mean}
+compute_frf_out.unique_frf
+    .set{unique_frf_for_mean}
 
-all_frf_to_collect
+compute_frf_out.all_frf_to_collect
     .collect()
     .set{all_frf_for_mean_frf}
 
 mean_frf = Channel.empty()
 if (params.mean_frf && !params.set_frf){
-    mean_frf = Mean_FRF(all_frf_for_mean_frf)
+    mean_frf_out = Mean_FRF(all_frf_for_mean_frf)
+    mean_frf = mean_frf_out.mean_frf
 }
 
-frf_for_fodf = unique_frf
+frf_for_fodf = compute_frf_out.unique_frf
 
 if (params.mean_frf) {
     frf_for_fodf = unique_frf_for_mean
@@ -908,29 +909,26 @@ if (params.mean_frf) {
                 .map{it -> [it[0], it[2]]}
 }
 
-dwi_and_grad_for_fodf
-    .join(b0_mask)
+extract_fodf_s_out.dwi_and_grad_for_fodf
+    .join(extract_b0_out.b0_mask)
     .join(dti_metrics_results.fa_md)
     .join(frf_for_fodf)
     .set{dwi_b0_metrics_frf_for_fodf}
 
-fodfs_m = Channel.empty()
 fodfs_m = FODF_Metrics(dwi_b0_metrics_frf_for_fodf)
 
-
 if (params.run_pft_tracking){
-    (pft_maps_for_pft_tracking, interface_for_pft_seeding_mask) = PFT_Tracking_Maps(map_wm_gm_csf_for_pft_maps)
+    pft_track_maps_out = PFT_Tracking_Maps(map_wm_gm_csf_for_pft_maps)
     wm_mask_for_pft_tracking
     .join(dti_metrics_results.fa)
-    .join(interface_for_pft_seeding_mask)
+    .join(pft_track_maps_out.interface_for_pft_seeding_mask)
     .set{wm_fa_int_for_pft}
 
-    seeding_mask_for_pft = Channel.empty()
-    seeding_mask_for_pft = PFT_Seeding_Mask(wm_fa_int_for_pft)
+    pft_seed_mask_out = PFT_Seeding_Mask(wm_fa_int_for_pft)
 
     fodfs_m.fodf
-    .join(pft_maps_for_pft_tracking)
-    .join(seeding_mask_for_pft)
+    .join(pft_track_maps_out.pft_maps_for_pft_tracking)
+    .join(pft_seed_mask_out.seeding_mask_for_pft)
     .set{fodf_maps_for_pft_tracking}
 
     PFT_Tracking(fodf_maps_for_pft_tracking,pft_random_seed)
@@ -947,22 +945,20 @@ if (params.run_local_tracking){
     .join(dti_metrics_results.fa)
     .set{wm_fa_for_local_tracking_mask}
 
-    tracking_mask_for_local = Channel.empty()
-    tracking_mask_for_local = Local_Tracking_Mask(wm_fa_for_local_tracking_mask)
+    local_track_mask_out = Local_Tracking_Mask(wm_fa_for_local_tracking_mask)
 
     wm_mask_for_local_tracking_mask
     .join(dti_metrics_results.fa)
     .set{wm_fa_for_local_seeding_mask}
 
-    tracking_seeding_mask_for_local = Channel.empty()
-    tracking_seeding_mask_for_local = Local_Seeding_Mask(wm_fa_for_local_seeding_mask)
+    local_seed_mask_out = Local_Seeding_Mask(wm_fa_for_local_seeding_mask)
 
     fodfs_m.fodf
-    .join(tracking_mask_for_local)
-    .join(tracking_seeding_mask_for_local)
+    .join(local_track_mask_out.tracking_mask_for_local)
+    .join(local_seed_mask_out.tracking_seeding_mask_for_local)
     .set{fodf_maps_for_local_tracking}
 
-Local_Tracking(fodf_maps_for_local_tracking, local_random_seed)
+    Local_Tracking(fodf_maps_for_local_tracking, local_random_seed)
 }
 
 }

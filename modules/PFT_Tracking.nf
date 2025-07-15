@@ -4,14 +4,10 @@ process PFT_Tracking {
 
     input:
     tuple val(sid), path(fodf), path(incl), path(exclude), path(seed)   // include -> incl do to conflit
-        //from fodf_maps_for_pft_tracking
-    each curr_seed //from pft_random_seed
+    each curr_seed
 
     output:
     path("${sid}__pft_tracking_${params.pft_algo}_${params.pft_seeding_mask_type}_seed_${curr_seed}.trk")
-
-    //when:
-      //  params.run_pft_tracking
 
     script:
     compress =\

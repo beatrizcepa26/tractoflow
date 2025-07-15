@@ -3,11 +3,10 @@ process Register_Freesurfer {
 
     input:
     tuple val(sid), path(aparc), path(wmparc), path(t1), path(affine),
-        path(warp) // from labels_mat_for_reg
+        path(warp)
 
     output:
-    tuple val(sid), path("${sid}__aparc_warped.nii.gz"), path("${sid}__wmparc_warped.nii.gz") 
-        // into labels_for_segmentation
+    tuple val(sid), path("${sid}__aparc_warped.nii.gz"), path("${sid}__wmparc_warped.nii.gz"), emit: labels_for_segmentation
 
     script:
     """

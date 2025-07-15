@@ -2,13 +2,10 @@ process Local_Seeding_Mask {
     cpus params.processes_cpus ?: params.process_local_seed_mask
 
     input:
-    tuple val(sid), path(wm), path(fa) // from wm_fa_for_local_seeding_mask
+    tuple val(sid), path(wm), path(fa)
 
     output:
-    tuple val(sid), path("${sid}__local_seeding_mask.nii.gz") // into tracking_seeding_mask_for_local
-
-    //when:
-    //    params.run_local_tracking
+    tuple val(sid), path("${sid}__local_seeding_mask.nii.gz"), emit: tracking_seeding_mask_for_local
 
     script:
     if (params.local_seeding_mask_type == "wm")

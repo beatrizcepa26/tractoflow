@@ -3,10 +3,10 @@ process N4_T1 {
     cpus params.processes_cpus ?: params.process_n4_t1
 
     input:
-    tuple val(sid), path(t1) // from t1_for_n4
+    tuple val(sid), path(t1)
 
     output:
-    tuple val(sid), path("*__t1_n4.nii.gz") //into t1_for_resample, t1_for_test_resample
+    tuple val(sid), path("*__t1_n4.nii.gz"), emit:  t1_for_resample
 
     script:
     """

@@ -4,11 +4,10 @@ process Compute_FRF {
 
     input:
     tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask)
-        //from dwi_b0_for_rf
 
     output:
-    tuple val(sid), path("${sid}__frf.txt") // into unique_frf, unique_frf_for_mean
-    path("${sid}__frf.txt") // into all_frf_to_collect
+    tuple val(sid), path("${sid}__frf.txt"), emit: unique_frf
+    path("${sid}__frf.txt"), emit: all_frf_to_collect
 
     script:
     if (params.set_frf)

@@ -7,12 +7,9 @@ process Segment_Tissues {
     output:
     tuple val(sid), path("${sid}__map_wm.nii.gz"), path("${sid}__map_gm.nii.gz"), \
         path("${sid}__map_csf.nii.gz"), emit: map_wm_gm_csf_for_pft_maps
-    tuple val(sid), path("${sid}__mask_wm.nii.gz"), emit: wm_mask_for_pft_tracking //, wm_mask_fast
+    tuple val(sid), path("${sid}__mask_wm.nii.gz"), emit: wm_mask_for_pft_tracking
     path("${sid}__mask_gm.nii.gz")
     path("${sid}__mask_csf.nii.gz")
-
-    //when:
-        //!params.run_tractoflow_abs
 
     script:
     """

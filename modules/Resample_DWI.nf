@@ -3,13 +3,10 @@ process Resample_DWI {
     cpus params.processes_cpus ?: params.process_resample_dwi
 
     input:
-    tuple val(sid), path(dwi), path(mask) //from dwi_mask_for_resample
+    tuple val(sid), path(dwi), path(mask)
 
     output:
-    tuple val(sid), path("${sid}__dwi_resampled.nii.gz") //into dwi_resampled_for_mix
-
-    //when:
-    //params.run_resample_dwi
+    tuple val(sid), path("${sid}__dwi_resampled.nii.gz"), emit: dwi_resampled_for_mix
 
     script:
     """

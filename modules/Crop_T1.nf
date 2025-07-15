@@ -2,11 +2,10 @@ process Crop_T1 {
     cpus params.processes_cpus ?: params.process_crop_t1
 
     input:
-    tuple val(sid), path(t1), path(t1_mask) // from t1_and_mask_for_crop
+    tuple val(sid), path(t1), path(t1_mask)
 
     output:
-    tuple val(sid), path("*__t1_bet_cropped.nii.gz"), path("*__t1_bet_mask_cropped.nii.gz")
-        // into t1_and_mask_for_reg
+    tuple val(sid), path("*__t1_bet_cropped.nii.gz"), path("*__t1_bet_mask_cropped.nii.gz"), emit: t1_and_mask_for_reg
 
     script:
     """

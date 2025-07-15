@@ -3,13 +3,10 @@ process Prepare_for_Topup {
   cpus params.processes_cpus ?: params.process_prep_topup
 
   input:
-    tuple val(sid), val(rev), file(dwi), file(bval), path(bvec) //from dwi_gradients_rev_b0_for_prepare_topup
+    tuple val(sid), val(rev), file(dwi), file(bval), path(bvec) 
 
   output:
-    tuple val(sid), path("${sid}_${rev}b0_mean.nii.gz"), val(rev) //into simple_b0_for_topup
-
-  //when:
-  //  params.run_topup && params.run_eddy
+    tuple val(sid), path("${sid}_${rev}b0_mean.nii.gz"), val(rev), emit: simple_b0_for_topup
 
   script:
   """

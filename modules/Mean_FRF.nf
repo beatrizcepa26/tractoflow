@@ -5,13 +5,10 @@ process Mean_FRF {
     cpus params.processes_cpus ?: params.process_mean_frf
 
     input:
-    path(all_frf) // from all_frf_for_mean_frf
+    path(all_frf)
 
     output:
-    path("mean_frf.txt") // into mean_frf
-
-    //when:
-    //params.mean_frf && !params.set_frf
+    path("mean_frf.txt"), emit: mean_frf
 
     script:
     """

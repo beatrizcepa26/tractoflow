@@ -3,7 +3,7 @@ process Bet_DWI {
     label 'big_mem'
 
     input:
-    tuple val(sid), path(dwi), path(bval), path(bvec) //from dwi_gradients_for_bet
+    tuple val(sid), path(dwi), path(bval), path(bvec) 
 
     output:
     tuple val(sid), path("*__b0_bet.nii.gz"), path("*__b0_bet_mask.nii.gz"), emit: b0_and_mask_for_crop

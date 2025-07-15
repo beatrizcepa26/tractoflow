@@ -3,13 +3,10 @@ process PFT_Seeding_Mask {
     cpus params.processes_cpus ?: params.process_pft_seeding_mask
 
     input:
-    tuple val(sid), path(wm), path(fa), path(interface_mask) // from wm_fa_int_for_pft
+    tuple val(sid), path(wm), path(fa), path(interface_mask)
 
     output:
-    tuple val(sid), path("${sid}__pft_seeding_mask.nii.gz") // into seeding_mask_for_pft
-
-    //when:
-      //  params.run_pft_tracking
+    tuple val(sid), path("${sid}__pft_seeding_mask.nii.gz"), emit: seeding_mask_for_pft
 
     script:
     if (params.pft_seeding_mask_type == "wm")

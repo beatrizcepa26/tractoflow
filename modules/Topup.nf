@@ -2,16 +2,13 @@ process Topup {
     cpus params.processes_cpus ?: params.process_topup
 
     input:
-      tuple val(sid), file(rev_b0), file(b0),  val(readout), val(encoding) // from rev_b0_with_readout_encoding_for_topup
+      tuple val(sid), file(rev_b0), file(b0),  val(readout), val(encoding)
 
     output:
       tuple val(sid), path("${sid}__corrected_b0s.nii.gz"), path("${params.prefix_topup}_fieldcoef.nii.gz"),
       path("${params.prefix_topup}_movpar.txt"), emit : topup_files_for_eddy_topup
       file "${sid}__rev_b0_warped.nii.gz"
       file "${sid}__rev_b0_mean.nii.gz"
-
-    //when:
-      // params.run_topup && params.run_eddy
 
     script:
     """

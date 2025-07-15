@@ -2,11 +2,10 @@ process Bet_T1 {
     cpus params.processes_cpus ?:  params.processes_brain_extraction_t1
 
     input:
-    tuple val(sid), path(t1) // from t1_for_bet
+    tuple val(sid), path(t1)
 
     output:
-    tuple val(sid), path("*__t1_bet.nii.gz"), path("*__t1_bet_mask.nii.gz") 
-        // into t1_and_mask_for_crop
+    tuple val(sid), path("*__t1_bet.nii.gz"), path("*__t1_bet_mask.nii.gz"), emit: t1_and_mask_for_crop
 
     script:
     """

@@ -4,17 +4,14 @@ process Eddy_Topup {
 
     input:
     tuple val(sid), file(dwi), file(bval), file(bvec), val(number_rev_dwi), file(b0s_corrected),
-        file(field), file(movpar), val(readout), val(encoding)// from dwi_gradients_mask_topup_files_for_eddy_topup
-    val(rev_b0_count) //from rev_b0_counter
-    val(rev_dwi_count) //from rev_dwi_counter
+        file(field), file(movpar), val(readout), val(encoding)
+    val(rev_b0_count)
+    val(rev_dwi_count)
 
     output:
     tuple val(sid), path("${sid}__dwi_corrected.nii.gz"), emit: dwi_from_eddy_topup
     tuple val(sid), path("${sid}__bval_eddy"), path("${sid}__dwi_eddy_corrected.bvec"), emit: gradients_from_eddy_topup
     file "${sid}__b0_bet_mask.nii.gz"
-
-    //when:
-    //(rev_b0_count > 0 || rev_dwi_count > 0) && params.run_topup && params.run_eddy
 
     // Corrected DWI is clipped to ensure there are no negative values
     // introduced by Eddy.

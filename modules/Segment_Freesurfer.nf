@@ -2,15 +2,12 @@ process Segment_Freesurfer {
     cpus params.processes_cpus ?: params.process_segment_freesurfer
 
     input:
-    tuple val(sid), path(aparc), path(wmparc) //from labels_for_segmentation
+    tuple val(sid), path(aparc), path(wmparc)
 
     output:
     tuple val(sid), path("${sid}__mask_wm.nii.gz"), emit: wm_mask_freesurfer
     path("${sid}__mask_gm.nii.gz")
     path("${sid}__mask_csf.nii.gz")
-
-    //when:
-        //params.run_tractoflow_abs
 
     script:
     """

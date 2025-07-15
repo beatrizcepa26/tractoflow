@@ -4,13 +4,10 @@ process Extract_DTI_Shell {
 
     input:
     tuple val(sid), path(dwi), path(bval), path(bvec)
-        //from dwi_and_grad_for_extract_dti_shell
 
     output:
     tuple val(sid), path("${sid}__dwi_dti.nii.gz"), path("${sid}__bval_dti"),
-        path("${sid}__bvec_dti") 
-        //into dwi_and_grad_for_dti_metrics, \
-        // dwi_and_grad_for_rf
+        path("${sid}__bvec_dti"), emit: dwi_and_grad_for_dti_metrics
 
     script:
     if (params.dti_shells)

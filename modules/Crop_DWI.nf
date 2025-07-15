@@ -3,7 +3,7 @@ process Crop_DWI {
     label 'big_mem'
 
     input:
-    tuple val(sid), path(dwi), path(b0), path(b0_mask) // from dwi_and_b0_mask_b0_for_crop
+    tuple val(sid), path(dwi), path(b0), path(b0_mask)
 
     output:
     tuple val(sid), path("*__dwi_cropped.nii.gz"), path("*__b0_mask_cropped.nii.gz"), emit: dwi_mask_for_normalize

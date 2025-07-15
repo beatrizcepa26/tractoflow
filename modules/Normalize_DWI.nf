@@ -4,10 +4,10 @@ process Normalize_DWI {
     cpus params.processes_cpus ?: params.process_normalize_dwi
 
     input:
-    tuple val(sid), path(dwi), path(mask), path(bval), path(bvec) //from dwi_mask_grad_for_normalize
+    tuple val(sid), path(dwi), path(mask), path(bval), path(bvec)
 
     output:
-    tuple val(sid), path("*__dwi_normalized.nii.gz"), emit: dwi_for_resample //, dwi_for_test_resample
+    tuple val(sid), path("*__dwi_normalized.nii.gz"), emit: dwi_for_resample
     path("*_fa_wm_mask.nii.gz")
 
     script:

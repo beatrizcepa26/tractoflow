@@ -4,10 +4,10 @@ process FODF_Metrics {
 
     input:
     tuple val(sid), path(dwi), path(bval), path(bvec), path(b0_mask), path(fa),
-        path(md), path(frf) // from dwi_b0_metrics_frf_for_fodf
+        path(md), path(frf)
 
     output:
-    tuple val(sid), path("${sid}__fodf.nii.gz"), emit: fodf // fodf_for_local_tracking
+    tuple val(sid), path("${sid}__fodf.nii.gz"), emit: fodf
     path("${sid}__peaks.nii.gz")
     path("${sid}__peak_indices.nii.gz")
     path("${sid}__afd_max.nii.gz")
