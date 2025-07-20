@@ -5,6 +5,7 @@ process Register_T1 {
     tuple val(sid), path(t1), path(t1_mask), path(fa), path(b0)
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     tuple val(sid), path("${sid}__t1_warped.nii.gz"), emit: t1_for_seg
     tuple val(sid), path("${sid}__t1_warped.nii.gz"), path("${sid}__output0GenericAffine.mat"), path("${sid}__output1Warp.nii.gz"), emit: t1_for_freesurfer_reg
     path("${sid}__output1InverseWarp.nii.gz")
@@ -12,6 +13,8 @@ process Register_T1 {
 
     script:
     """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1

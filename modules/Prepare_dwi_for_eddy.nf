@@ -7,10 +7,13 @@ process Prepare_dwi_for_eddy {
         path(rev_bvec)
 
   output:
+    path "${sid}_${task.process}_dstat.*"
     tuple val(sid), path("${sid}__concatenated_dwi.nii.gz"), path("${sid}__concatenated_dwi.bval"), path("${sid}__concatenated_dwi.bvec"), env ('rev_number_dir'), emit: concatenated_dwi_for_eddy
 
   script:
   """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
     scil_concatenate_dwi.py ${sid}__concatenated_dwi.nii.gz ${sid}__concatenated_dwi.bval ${sid}__concatenated_dwi.bvec -f\
       --in_dwis ${dwi} ${rev_dwi} --in_bvals ${bval} ${rev_bval}\
       --in_bvecs ${bvec} ${rev_bvec}

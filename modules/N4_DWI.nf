@@ -7,10 +7,13 @@ process N4_DWI {
     tuple val(sid), path(dwi), path(b0), path(b0_mask)
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     tuple val(sid), path("*__dwi_n4.nii.gz"),emit: dwi_for_crop
 
     script:
     """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1

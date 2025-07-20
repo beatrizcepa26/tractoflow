@@ -7,12 +7,15 @@ process Bet_Prelim_DWI {
     val(rev_dwi_count)
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     tuple val(sid), path ("${sid}__b0_bet_mask_dilated.nii.gz"), emit : b0_mask_for_eddy
     path "${sid}__b0_bet.nii.gz"
     path "${sid}__b0_bet_mask.nii.gz"
 
     script:
     """
+
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1

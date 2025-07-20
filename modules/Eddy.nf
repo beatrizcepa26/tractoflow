@@ -8,7 +8,8 @@ process Eddy {
     val(rev_dwi_count)
 
     output:
-    tuple val(sid), path("${sid}__dwi_corrected.nii.gz"), emit : into dwi_from_eddy
+    path "${sid}_${task.process}_dstat.*"
+    tuple val(sid), path("${sid}__dwi_corrected.nii.gz"), emit : dwi_from_eddy
     tuple val(sid), path("${sid}__bval_eddy"), path("${sid}__dwi_eddy_corrected.bvec"), emit: gradients_from_eddy
 
     // Corrected DWI is clipped to 0 since Eddy can introduce negative values.
@@ -18,6 +19,8 @@ process Eddy {
             slice_drop_flag="--slice_drop_correction"
         }
         """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
         export OMP_NUM_THREADS=$task.cpus
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
         export OPENBLAS_NUM_THREADS=1

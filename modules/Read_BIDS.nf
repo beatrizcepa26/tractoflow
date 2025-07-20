@@ -16,6 +16,7 @@ process Read_BIDS {
     script:
     def clean_flag = params.clean_bids ? '--clean ' : ''
     """
+
     scil_validate_bids.py $bids_folder tractoflow_bids_struct.json\
         --readout $params.readout $clean_flag\
         ${!fs_folder.empty() ? "--fs $fs_folder" : ""}\

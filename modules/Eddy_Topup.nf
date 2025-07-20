@@ -9,6 +9,7 @@ process Eddy_Topup {
     val(rev_dwi_count)
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     tuple val(sid), path("${sid}__dwi_corrected.nii.gz"), emit: dwi_from_eddy_topup
     tuple val(sid), path("${sid}__bval_eddy"), path("${sid}__dwi_eddy_corrected.bvec"), emit: gradients_from_eddy_topup
     file "${sid}__b0_bet_mask.nii.gz"
@@ -20,6 +21,8 @@ process Eddy_Topup {
         if (params.use_slice_drop_correction)
             slice_drop_flag="--slice_drop_correction"
         """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
         export OMP_NUM_THREADS=$task.cpus
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
         export OPENBLAS_NUM_THREADS=1

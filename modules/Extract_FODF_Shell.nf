@@ -6,12 +6,15 @@ process Extract_FODF_Shell {
     tuple val(sid), path(dwi), path(bval), path(bvec)
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     tuple val(sid), path("${sid}__dwi_fodf.nii.gz"), path("${sid}__bval_fodf"),
         path("${sid}__bvec_fodf"), emit: dwi_and_grad_for_fodf
 
     script:
     if (params.fodf_shells)
       """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
@@ -21,6 +24,8 @@ process Extract_FODF_Shell {
       """
     else
       """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
       export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
       export OMP_NUM_THREADS=1
       export OPENBLAS_NUM_THREADS=1
