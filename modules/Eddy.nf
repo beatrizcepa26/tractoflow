@@ -8,7 +8,7 @@ process Eddy {
     val(rev_dwi_count)
 
     output:
-    tuple val(sid), path("${sid}__dwi_corrected.nii.gz"), emit : into dwi_from_eddy
+    tuple val(sid), path("${sid}__dwi_corrected.nii.gz"), emit : dwi_from_eddy
     tuple val(sid), path("${sid}__bval_eddy"), path("${sid}__dwi_eddy_corrected.bvec"), emit: gradients_from_eddy
 
     // Corrected DWI is clipped to 0 since Eddy can introduce negative values.
