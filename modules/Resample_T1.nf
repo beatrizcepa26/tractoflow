@@ -1,5 +1,4 @@
 process Resample_T1 {
-    cpus params.processes_cpus ?: params.process_resample_t1
 
     input:
     tuple val(sid), path(t1)

@@ -1,7 +1,5 @@
 process Prepare_dwi_for_eddy {
 
-  cpus params.processes_cpus ?: params.process_prep_dwi_eddy
-
   input:
     tuple val(sid), file(dwi), file(bval), file(bvec), file(rev_dwi), file(rev_bval), \
         path(rev_bvec)

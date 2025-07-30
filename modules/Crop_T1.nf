@@ -1,5 +1,4 @@
 process Crop_T1 {
-    cpus params.processes_cpus ?: params.process_crop_t1
 
     input:
     tuple val(sid), path(t1), path(t1_mask)

@@ -1,7 +1,5 @@
 process Normalize_DWI {
-
     label 'big_mem'
-    cpus params.processes_cpus ?: params.process_normalize_dwi
 
     input:
     tuple val(sid), path(dwi), path(mask), path(bval), path(bvec)

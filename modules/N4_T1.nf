@@ -1,7 +1,5 @@
 process N4_T1 {
 
-    cpus params.processes_cpus ?: params.process_n4_t1
-
     input:
     tuple val(sid), path(t1)
 

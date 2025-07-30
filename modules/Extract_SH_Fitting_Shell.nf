@@ -1,5 +1,4 @@
 process Extract_SH_Fitting_Shell {
-    cpus params.processes_cpus ?: params.process_extract_sh_fit_shell
 
     input:
     tuple val(sid), path(dwi), path(bval), path(bvec)

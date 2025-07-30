@@ -1,7 +1,5 @@
 process Prepare_for_Topup {
 
-  cpus params.processes_cpus ?: params.process_prep_topup
-
   input:
     tuple val(sid), val(rev), file(dwi), file(bval), path(bvec) 
 

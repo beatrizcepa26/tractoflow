@@ -1,5 +1,4 @@
 process Compute_FRF {
-    cpus params.processes_cpus ?: params.process_compute_frf
     label 'big_mem'
 
     input:

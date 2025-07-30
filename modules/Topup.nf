@@ -1,5 +1,4 @@
 process Topup {
-    cpus params.processes_cpus ?: params.process_topup
 
     input:
       tuple val(sid), file(rev_b0), file(b0),  val(readout), val(encoding)

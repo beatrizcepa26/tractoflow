@@ -1,7 +1,5 @@
 process PFT_Seeding_Mask {
 
-    cpus params.processes_cpus ?: params.process_pft_seeding_mask
-
     input:
     tuple val(sid), path(wm), path(fa), path(interface_mask)
 

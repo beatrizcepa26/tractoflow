@@ -1,5 +1,4 @@
 process README {
-    cpus 1
     publishDir params.Readme_Publish_Dir
     tag "README"
 

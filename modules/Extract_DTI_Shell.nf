@@ -1,6 +1,5 @@
 process Extract_DTI_Shell {
     label 'big_mem'
-    cpus params.processes_cpus ?: params.process_dti_shell
 
     input:
     tuple val(sid), path(dwi), path(bval), path(bvec)

@@ -1,5 +1,4 @@
 process Segment_Freesurfer {
-    cpus params.processes_cpus ?: params.process_segment_freesurfer
 
     input:
     tuple val(sid), path(aparc), path(wmparc)

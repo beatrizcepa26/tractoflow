@@ -1,5 +1,4 @@
 process Denoise_DWI {
-    cpus params.processes_cpus ?: params.processes_denoise_dwi
     label 'big_mem'
 
     input:

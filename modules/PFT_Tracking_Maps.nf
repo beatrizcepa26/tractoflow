@@ -1,7 +1,5 @@
 process PFT_Tracking_Maps {
 
-    cpus params.processes_cpus ?: params.process_pft_tracking_maps
-
     input:
     tuple val(sid), path(wm), path(gm), path(csf)
 
