@@ -683,7 +683,7 @@ rev_b0_counter
 if (eddy_trigger){
     eddy_out = Eddy(dwi_gradients_mask_topup_files_for_eddy, rev_b0_counter, number_rev_dwi)
     dwi_from_eddy = eddy_out.dwi_from_eddy
-    gradients_from_eddy = eddy.gradients_from_eddy
+    gradients_from_eddy = eddy_out.gradients_from_eddy
 }
 
 dwi_for_eddy
