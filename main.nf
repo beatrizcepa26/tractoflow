@@ -917,7 +917,7 @@ if (params.run_local_tracking){
     .join(tracking_seeding_mask_for_local)
     .set{fodf_maps_for_local_tracking}
 
-Local_Tracking(fodf_maps_for_local_tracking, local_random_seed)
+    Local_Tracking(fodf_maps_for_local_tracking, local_random_seed)
 }
 
 workflow.onComplete {
@@ -925,8 +925,5 @@ workflow.onComplete {
     log.info "Execution status: ${ workflow.success ? 'OK' : 'failed' }"
     log.info "Execution duration: $workflow.duration"
 }
+
 }
-
-
-
-
