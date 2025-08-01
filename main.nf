@@ -920,10 +920,10 @@ if (params.run_local_tracking){
     Local_Tracking(fodf_maps_for_local_tracking, local_random_seed)
 }
 
+}
+
 workflow.onComplete {
     log.info "Pipeline completed at: $workflow.complete"
     log.info "Execution status: ${ workflow.success ? 'OK' : 'failed' }"
     log.info "Execution duration: $workflow.duration"
-}
-
 }
