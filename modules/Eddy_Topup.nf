@@ -1,6 +1,6 @@
 process Eddy_Topup {
     label 'gpu_capable'
-    memory { 5.GB * task.attempt }
+    // memory { 5.GB * task.attempt }
 
     when:
     (params.run_topup && params.run_eddy)

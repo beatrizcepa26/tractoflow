@@ -1,5 +1,5 @@
 process Eddy {
-    memory { 5.GB * task.attempt }
+    // memory { 5.GB * task.attempt }
     label 'gpu_capable'
 
     when:
