@@ -847,11 +847,11 @@ wm_mask_freesurfer
     .concat(wm_mask_for_pft_tracking)
     .set{wm_mask_for_local_tracking_mask}
 
-dwi_and_grad_for_dti_metrics
-    .join(extract_b0_out.b0_mask)
-    .set{dwi_b0_for_rf}
+// dwi_and_grad_for_dti_metrics
+//     .join(extract_b0_out.b0_mask)
+//     .set{dwi_b0_for_rf}
 
-compute_frf_out = Compute_FRF(dwi_b0_for_rf)
+compute_frf_out = Compute_FRF(dwi_and_grad_for_dti_metrics)
 
 compute_frf_out.unique_frf
     .set{unique_frf_for_mean}
