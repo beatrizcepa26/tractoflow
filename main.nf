@@ -487,7 +487,7 @@ rev_b0_counter
     }
     .set { run_bet_prelim_dwi }
 
-if (run_bet_prelim_dwi==false){
+if (run_bet_prelim_dwi){
 	bet_prelim_dwi_results = Bet_Prelim_DWI(dwi_gradient_for_prelim_bet, rev_b0_counter, number_rev_dwi)
 	b0_mask_for_eddy = bet_prelim_dwi_results.b0_mask_for_eddy
 }
