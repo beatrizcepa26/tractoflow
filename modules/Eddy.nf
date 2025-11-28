@@ -29,6 +29,7 @@ process Eddy {
             --encoding_direction $encoding\
             --readout $readout --out_script --fix_seed\
             $slice_drop_flag
+        sed -i 's|eddy_cuda.*|singularity exec --nv /fsl_6.0.3_20200905.simg eddy_cuda|' eddy.sh
         sh eddy.sh
         fslmaths dwi_eddy_corrected.nii.gz -thr 0 ${sid}__dwi_corrected.nii.gz
         mv dwi_eddy_corrected.eddy_rotated_bvecs ${sid}__dwi_eddy_corrected.bvec
