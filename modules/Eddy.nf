@@ -24,14 +24,11 @@ process Eddy {
         export OMP_NUM_THREADS=$task.cpus
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
         export OPENBLAS_NUM_THREADS=1
-        export FSLDIR=/fsl
-        export PATH=$FSLDIR/bin:$PATH
         scil_prepare_eddy_command.py $dwi $bval $bvec $mask\
             --eddy_cmd $params.eddy_cmd --b0_thr $params.b0_thr_extract_b0\
             --encoding_direction $encoding\
             --readout $readout --out_script --fix_seed\
             $slice_drop_flag
-        sed -i "s|\beddy_cuda\b|/fsl/opt/fsl-6.0.7.8/bin/eddy_cuda|g" eddy.sh
         sh eddy.sh
         fslmaths dwi_eddy_corrected.nii.gz -thr 0 ${sid}__dwi_corrected.nii.gz
         mv dwi_eddy_corrected.eddy_rotated_bvecs ${sid}__dwi_eddy_corrected.bvec
