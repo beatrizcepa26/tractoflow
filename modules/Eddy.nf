@@ -29,7 +29,7 @@ process Eddy {
             --encoding_direction $encoding\
             --readout $readout --out_script --fix_seed\
             $slice_drop_flag
-        sed -i "s|eddy_cuda*|/fsl/opt/fsl-6.0.7.8/bin/eddy_cuda|g" eddy.sh
+        sed -i "s|\beddy_cuda\b|/fsl/opt/fsl-6.0.7.8/bin/eddy_cuda|g" eddy.sh
         sh eddy.sh
         fslmaths dwi_eddy_corrected.nii.gz -thr 0 ${sid}__dwi_corrected.nii.gz
         mv dwi_eddy_corrected.eddy_rotated_bvecs ${sid}__dwi_eddy_corrected.bvec
