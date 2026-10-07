@@ -15,6 +15,9 @@ process Eddy_Topup {
 
     // Corrected DWI is clipped to ensure there are no negative values
     // introduced by Eddy.
+    when:
+        (rev_b0_count > 0 || rev_dwi_count > 0) && params.run_topup && params.run_eddy
+
     script:
         slice_drop_flag=""
         if (params.use_slice_drop_correction)
