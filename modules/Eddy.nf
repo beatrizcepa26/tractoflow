@@ -13,6 +13,9 @@ process Eddy {
     tuple val(sid), path("${sid}__bval_eddy"), path("${sid}__dwi_eddy_corrected.bvec"), emit: gradients_from_eddy
 
     // Corrected DWI is clipped to 0 since Eddy can introduce negative values.
+    when:
+        (rev_b0_count == 0 && rev_dwi_count == 0 && params.run_eddy) || (!params.run_topup && params.run_eddy)
+
     script:
         slice_drop_flag=""
         if (params.use_slice_drop_correction) {
