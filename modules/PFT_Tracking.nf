@@ -1,6 +1,12 @@
+def pft_trackers(cpus) {
+    def fit = params.max_memory_gb ? (params.max_memory_gb as int).intdiv(params.pft_tracker_memory_gb as int) : cpus
+    return Math.max(1, [cpus as int, params.pft_max_trackers as int, fit as int].min())
+}
+
 process PFT_Tracking {
 
     cpus params.processes_cpus ?: params.process_pft_tracking
+    memory { "${pft_trackers(task.cpus) * (params.pft_tracker_memory_gb as int)} GB" }
 
     input:
     tuple val(sid), path(fodf), path(incl), path(exclude), path(seed)   // include -> incl do to conflit
@@ -12,7 +18,7 @@ process PFT_Tracking {
     script:
     compress =\
         params.pft_compress_streamlines ? '--compress ' + params.pft_compress_value : ''
-    trackers = Math.min(task.cpus as int, params.pft_max_trackers as int)
+    trackers = pft_trackers(task.cpus)
     out = "${sid}__pft_tracking_${params.pft_algo}_${params.pft_seeding_mask_type}_seed_${curr_seed}.trk"
         """
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
