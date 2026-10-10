@@ -7,12 +7,15 @@ process Normalize_DWI {
     tuple val(sid), path(dwi), path(mask), path(bval), path(bvec)
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     tuple val(sid), path("*__dwi_normalized.nii.gz"), emit: dwi_for_resample
     path("*_fa_wm_mask.nii.gz")
 
     script:
     if (params.dti_shells)
       """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
       export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
       export OMP_NUM_THREADS=1
       export OPENBLAS_NUM_THREADS=1
@@ -27,6 +30,8 @@ process Normalize_DWI {
       """
     else
       """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1

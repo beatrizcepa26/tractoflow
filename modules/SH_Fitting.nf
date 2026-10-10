@@ -6,10 +6,13 @@ process SH_Fitting {
     tuple val(sid), path(dwi), path(bval), path(bvec)
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     path("${sid}__dwi_sh.nii.gz")
 
     script:
     """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1

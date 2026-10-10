@@ -13,6 +13,7 @@ process PFT_Tracking {
     each curr_seed
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     path("${sid}__pft_tracking_${params.pft_algo}_${params.pft_seeding_mask_type}_seed_${curr_seed}.trk")
 
     script:
@@ -21,6 +22,8 @@ process PFT_Tracking {
     trackers = pft_trackers(task.cpus)
     out = "${sid}__pft_tracking_${params.pft_algo}_${params.pft_seeding_mask_type}_seed_${curr_seed}.trk"
         """
+        python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1

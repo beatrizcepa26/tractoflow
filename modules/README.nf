@@ -15,6 +15,7 @@ process README {
 
 
     """
+
     echo "TractoFlow pipeline\n" >> readme.txt
     echo "Start time: $workflow.start\n" >> readme.txt
     echo "[Command-line]\n$workflow.commandLine\n" >> readme.txt

@@ -6,11 +6,14 @@ process PFT_Seeding_Mask {
     tuple val(sid), path(wm), path(fa), path(interface_mask)
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     tuple val(sid), path("${sid}__pft_seeding_mask.nii.gz"), emit: seeding_mask_for_pft
 
     script:
     if (params.pft_seeding_mask_type == "wm")
         """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1
@@ -19,10 +22,14 @@ process PFT_Seeding_Mask {
         """
     else if (params.pft_seeding_mask_type == "interface")
         """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
         mv $interface_mask ${sid}__pft_seeding_mask.nii.gz
         """
     else if (params.pft_seeding_mask_type == "fa")
         """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1

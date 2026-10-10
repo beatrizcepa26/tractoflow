@@ -7,6 +7,7 @@ process Local_Tracking {
     each curr_seed
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     path("${sid}__local_tracking_${params.local_algo}_${params.local_seeding_mask_type}_seeding_${params.local_tracking_mask_type}_mask_seed_${curr_seed}.trk")
 
     script:
@@ -16,6 +17,8 @@ process Local_Tracking {
         params.local_tracking_gpu ? '--use_gpu --batch_size ' + params.local_batch_size_gpu : ''
 
         """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
         export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
         export OMP_NUM_THREADS=1
         export OPENBLAS_NUM_THREADS=1

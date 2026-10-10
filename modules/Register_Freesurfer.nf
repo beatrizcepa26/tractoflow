@@ -6,10 +6,13 @@ process Register_Freesurfer {
         path(warp)
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     tuple val(sid), path("${sid}__aparc_warped.nii.gz"), path("${sid}__wmparc_warped.nii.gz"), emit: labels_for_segmentation
 
     script:
     """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1

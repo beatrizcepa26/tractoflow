@@ -5,6 +5,7 @@ process Segment_Tissues {
     tuple val(sid), path(t1) // from t1_for_seg
 
     output:
+    path "${sid}_${task.process}_dstat.*"
     tuple val(sid), path("${sid}__map_wm.nii.gz"), path("${sid}__map_gm.nii.gz"), \
         path("${sid}__map_csf.nii.gz"), emit: map_wm_gm_csf_for_pft_maps
     tuple val(sid), path("${sid}__mask_wm.nii.gz"), emit: wm_mask_for_pft_tracking
@@ -13,6 +14,8 @@ process Segment_Tissues {
 
     script:
     """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
     export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1

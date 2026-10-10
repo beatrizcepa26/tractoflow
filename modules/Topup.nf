@@ -5,6 +5,7 @@ process Topup {
       tuple val(sid), file(rev_b0), file(b0),  val(readout), val(encoding)
 
     output:
+    path "${sid}_${task.process}_dstat.*"
       tuple val(sid), path("${sid}__corrected_b0s.nii.gz"), path("${params.prefix_topup}_fieldcoef.nii.gz"),
       path("${params.prefix_topup}_movpar.txt"), emit : topup_files_for_eddy_topup
       file "${sid}__rev_b0_warped.nii.gz"
@@ -12,6 +13,8 @@ process Topup {
 
     script:
     """
+    python /dstat.py -tcdrnmg -C all --float --noheaders --output ${sid}_${task.process}_dstat.csv > ${sid}_${task.process}_dstat.csv 2>&1 &
+
       export OMP_NUM_THREADS=$task.cpus
       export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
       export OPENBLAS_NUM_THREADS=1
